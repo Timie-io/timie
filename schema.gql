@@ -1,0 +1,19 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  creationDate: Date!
+  password: String!
+  isAdmin: Boolean!
+}
+
+"""Date custom scalar type"""
+scalar Date
+
+type Query {
+  user(id: String!): User!
+}

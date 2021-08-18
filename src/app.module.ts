@@ -10,10 +10,10 @@ import { UsersModule } from './users/users.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    // GraphQLModule.forRoot({
-    //   installSubscriptionHandlers: true,
-    //   autoSchemaFile: 'schema.gql',
-    // }),
+    GraphQLModule.forRoot({
+      installSubscriptionHandlers: true,
+      autoSchemaFile: 'schema.gql',
+    }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
