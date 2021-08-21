@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { NewUserInput } from './dto/new-user.input';
 import { UsersArgs } from './dto/users.args';
 import { User } from './user.entity';
@@ -12,11 +12,17 @@ export class UsersService {
   ) {}
 
   async create(data: NewUserInput): Promise<User> {
-    return {} as any;
+    const user = this.repository.create(data);
+
+    return await this.repository.save(user);
   }
 
-  async findOneById(id: string): Promise<User> {
-    return {} as any;
+  async findOneById(id: number): Promise<User | undefined> {
+    return await this.repository.findOne(id);
+  }
+
+  async findOneByEmail(email: string): Promise<User | undefined> {
+    return await this.repository.findOne({ email: email });
   }
 
   async findAll(recipesArgs: UsersArgs): Promise<User[]> {

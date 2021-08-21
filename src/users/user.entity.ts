@@ -2,7 +2,7 @@
  * User entity
  */
 
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -18,6 +18,6 @@ export class User {
   @Column({ default: false })
   isAdmin: boolean;
 
-  @Column()
+  @Column({ default: () => 'now()' })
   creationDate: Date;
 }

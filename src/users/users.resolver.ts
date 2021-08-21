@@ -1,7 +1,9 @@
-import { NotFoundException } from '@nestjs/common';
-import { Args, Resolver, Query } from '@nestjs/graphql';
-import { UsersService } from './users.service';
+import { UseGuards } from '@nestjs/common';
+import { Args, Query, Resolver } from '@nestjs/graphql';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
 import { User } from './models/user.model';
+import { UsersService } from './users.service';
 
 @Resolver()
 export class UsersResolver {
@@ -9,11 +11,12 @@ export class UsersResolver {
 
   @Query((returns) => User)
   async user(@Args('id') id: string) {
-    const user = new User();
-    user.id = '1234';
-    user.name = 'Emiliano';
-    user.email = 'emr.frei@gmail.com';
-    user.password = '1234';
-    return user;
+    return this.usersService.findOneById(parseInt(id));
+  }
+
+  @Query((returns) => User)
+  @UseGuards(GqlAuthGuard)
+  whoAmI(@CurrentUser() user: User) {
+    return this.usersService.findOneById(parseInt(user.id));
   }
 }
