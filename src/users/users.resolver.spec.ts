@@ -1,3 +1,4 @@
+import { UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from './user.entity';
 import { UsersResolver } from './users.resolver';
@@ -41,6 +42,57 @@ describe('UsersResolver', () => {
   });
 
   it('should return a user by ID', async () => {
-    expect(await resolver.user('1')).toEqual(user);
+    const currentUser = {
+      id: '1',
+      name: user.name,
+      email: user.email,
+      creationDate: user.creationDate,
+      isAdmin: user.isAdmin,
+      password: user.password,
+    };
+    expect(await resolver.user('1', currentUser)).toEqual(user);
+  });
+
+  it('should throw unauthorized error when asking for a user and not me or not admin', async () => {
+    const currentUser = {
+      id: '1',
+      name: user.name,
+      email: user.email,
+      creationDate: user.creationDate,
+      isAdmin: user.isAdmin,
+      password: user.password,
+    };
+    try {
+      await resolver.user('2', currentUser);
+    } catch (err) {
+      expect(err).toBeInstanceOf(UnauthorizedException);
+    }
+  });
+
+  it('should not throw unauthorized error when asking for a user and Im admin', async () => {
+    const currentUser = {
+      id: '1',
+      name: user.name,
+      email: user.email,
+      creationDate: user.creationDate,
+      isAdmin: true,
+      password: user.password,
+    };
+    expect(await resolver.user('2', currentUser)).toEqual(user);
+  });
+
+  it('should return my user data (me)', async () => {
+    const currentUser = {
+      id: '1',
+      name: user.name,
+      email: user.email,
+      creationDate: user.creationDate,
+      isAdmin: false,
+      password: user.password,
+    };
+    const returnedUser = { ...currentUser } as any;
+    returnedUser['id'] = 1;
+
+    expect(await resolver.user('1', currentUser)).toEqual(returnedUser);
   });
 });
