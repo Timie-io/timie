@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
-import { User } from 'src/users/user.entity';
-import { UsersService } from 'src/users/users.service';
 import { promisify } from 'util';
+import { User } from '../users/user.entity';
+import { UsersService } from '../users/users.service';
 import { SignUpUser } from './dto/sign-up.user';
 
 const scrypt = promisify(_scrypt);
@@ -14,6 +14,12 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
+
+  static async generateSaltedHashedPassword(password: string): Promise<string> {
+    const salt = randomBytes(8).toString('hex');
+    const hash = (await scrypt(password, salt, 32)) as Buffer;
+    return salt + '.' + hash.toString('hex');
+  }
 
   async validateUser(
     userId: number,
@@ -41,14 +47,12 @@ export class AuthService {
       throw new BadRequestException('email in use');
     }
     if (!attrs.password) {
-      throw new BadRequestException('password is required');
+      throw new BadRequestException('password required');
     }
 
-    const salt = randomBytes(8).toString('hex');
-    const hash = (await scrypt(attrs.password, salt, 32)) as Buffer;
-    const result = salt + '.' + hash.toString('hex');
-
-    attrs.password = result;
+    attrs.password = await AuthService.generateSaltedHashedPassword(
+      attrs.password,
+    );
 
     return await this.usersService.create(attrs);
   }
