@@ -34,4 +34,11 @@ describe('Authentication System', () => {
 
     expect(res.body.access_token).toBeDefined();
   });
+
+  it('should respond 401 unauthorized', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/signin')
+      .send({ username: email, password: 'wrong password' })
+      .expect(401);
+  });
 });
