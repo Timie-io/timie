@@ -16,5 +16,5 @@ scalar Date
 
 type Query {
   user(id: String!): User!
-  whoAmI: User!
+  me: User!
 }

@@ -27,6 +27,7 @@ import { UsersModule } from './users/users.module';
           cli: {
             migrationsDir: 'migration',
           },
+          keepConnectionAlive: true,
         };
       },
     }),
