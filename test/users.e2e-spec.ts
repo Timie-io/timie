@@ -23,7 +23,7 @@ describe('Users E2E Tests', () => {
 
   const getUserByIdQuery = gql`
     query getUserById($id: String!) {
-      getUserById(id: $id) {
+      user(id: $id) {
         id
         name
         email
@@ -35,7 +35,7 @@ describe('Users E2E Tests', () => {
 
   const getLoggedUserQuery = gql`
     {
-      getLoggedUser {
+      loggedUser {
         id
         name
         email
@@ -64,13 +64,12 @@ describe('Users E2E Tests', () => {
         query: print(getLoggedUserQuery),
       })
       .expect(200);
-    console.log(res.body);
     const {
-      data: { getLoggedUser },
+      data: { loggedUser },
     } = res.body;
-    expect(getLoggedUser.id).toBeDefined();
-    expect(getLoggedUser.email).toEqual(email);
-    expect(getLoggedUser.name).toEqual(name);
+    expect(loggedUser.id).toBeDefined();
+    expect(loggedUser.email).toEqual(email);
+    expect(loggedUser.name).toEqual(name);
   });
 
   it('query a user by id', async () => {
@@ -81,14 +80,14 @@ describe('Users E2E Tests', () => {
         operationName: 'getUserById',
         query: print(getUserByIdQuery),
         variables: {
-          id: '5',
+          id: '1',
         },
       });
     const {
-      data: { getUserById },
+      data: { user },
     } = res.body;
-    expect(getUserById).toBeDefined();
-    expect(typeof getUserById.email).toBe('string');
-    expect(getUserById.id).toEqual('5');
+    expect(user).toBeDefined();
+    expect(typeof user.email).toBe('string');
+    expect(user.id).toEqual('1');
   });
 });

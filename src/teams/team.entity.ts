@@ -12,13 +12,13 @@ export class Team {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column()
   description: string;
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => User, (user) => user.teams)
   @JoinTable()
-  users: User[];
+  members: User[];
 }

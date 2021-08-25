@@ -2,6 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Team {
+  id: ID!
+  name: String!
+  description: String!
+  members: [User!]
+}
+
 type User {
   id: ID!
   name: String!
@@ -9,12 +16,15 @@ type User {
   creationDate: Date!
   password: String!
   isAdmin: Boolean!
+  teams: [Team!]
 }
 
 """Date custom scalar type"""
 scalar Date
 
 type Query {
-  getUserById(id: String!): User!
-  getLoggedUser: User!
+  user(id: String!): User!
+  loggedUser: User!
+  team(id: String!): Team!
+  teams: [Team!]!
 }

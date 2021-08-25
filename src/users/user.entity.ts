@@ -2,8 +2,8 @@
  * User entity
  */
 
-import { Team } from 'src/teams/team.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Team } from '../teams/team.entity';
 
 @Entity()
 export class User {
@@ -25,6 +25,6 @@ export class User {
   @Column({ default: () => 'now()' })
   creationDate: Date;
 
-  @ManyToMany(() => Team)
+  @ManyToMany(() => Team, (team) => team.members)
   teams: Team[];
 }

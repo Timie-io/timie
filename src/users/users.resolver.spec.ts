@@ -7,7 +7,7 @@ import { UsersService } from './users.service';
 describe('UsersResolver', () => {
   let resolver: UsersResolver;
   let usersService: Partial<UsersService>;
-  let user: User;
+  let user: Partial<User>;
 
   beforeEach(async () => {
     user = {
@@ -21,10 +21,10 @@ describe('UsersResolver', () => {
 
     usersService = {
       findOneById: async (id: number) => {
-        return user;
+        return user as User;
       },
       findOneByEmail: async (email: string) => {
-        return user;
+        return user as User;
       },
     };
     const module: TestingModule = await Test.createTestingModule({
@@ -50,7 +50,7 @@ describe('UsersResolver', () => {
       isAdmin: user.isAdmin,
       password: user.password,
     };
-    expect(await resolver.getUserById('1', currentUser)).toEqual(user);
+    expect(await resolver.user('1', currentUser)).toEqual(user);
   });
 
   it('should throw unauthorized error when asking for a user and not me or not admin', async () => {
@@ -63,7 +63,7 @@ describe('UsersResolver', () => {
       password: user.password,
     };
     try {
-      await resolver.getUserById('2', currentUser);
+      await resolver.user('2', currentUser);
     } catch (err) {
       expect(err).toBeInstanceOf(UnauthorizedException);
     }
@@ -78,7 +78,7 @@ describe('UsersResolver', () => {
       isAdmin: true,
       password: user.password,
     };
-    expect(await resolver.getUserById('2', currentUser)).toEqual(user);
+    expect(await resolver.user('2', currentUser)).toEqual(user);
   });
 
   it('should return my user data (me)', async () => {
@@ -93,6 +93,6 @@ describe('UsersResolver', () => {
     const returnedUser = { ...currentUser } as any;
     returnedUser['id'] = 1;
 
-    expect(await resolver.getLoggedUser(currentUser)).toEqual(returnedUser);
+    expect(await resolver.loggedUser(currentUser)).toEqual(returnedUser);
   });
 });
