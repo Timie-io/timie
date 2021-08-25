@@ -11,8 +11,8 @@ export class UsersResolver {
 
   @Query((returns) => User)
   @UseGuards(GqlAuthGuard)
-  async user(@Args('id') id: string, @CurrentUser() user: User) {
-    if (!(user.id === id || user.isAdmin)) {
+  async getUserById(@Args('id') id: string, @CurrentUser() user: User) {
+    if (!(parseInt(user.id) === parseInt(id) || user.isAdmin)) {
       throw new UnauthorizedException();
     }
     return this.usersService.findOneById(parseInt(id));
@@ -20,7 +20,7 @@ export class UsersResolver {
 
   @Query((returns) => User)
   @UseGuards(GqlAuthGuard)
-  me(@CurrentUser() user: User) {
+  getLoggedUser(@CurrentUser() user: User) {
     return this.usersService.findOneById(parseInt(user.id));
   }
 }
