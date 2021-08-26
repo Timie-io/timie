@@ -1,6 +1,7 @@
-import { Field } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 import { Length, MaxLength } from 'class-validator';
 
+@InputType()
 export class NewTeamInput {
   @Field()
   @Length(1, 32)

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
@@ -32,37 +28,22 @@ export class TeamsService {
   }
 
   async create(data: NewTeamInput, owner: User): Promise<Team> {
-    let team = await this.findOneByName(data.name);
-    if (team) {
-      throw new BadRequestException('team exists');
-    }
-    team = this.repository.create(data);
-    team.members.push(owner);
+    const team = this.repository.create(data);
+    team.owner = owner;
+    team.members = [owner]; // it's a member too
     return await this.repository.save(team);
   }
 
-  async addUser(id: number, user: User): Promise<Team> {
-    const team = await this.repository.findOne(id);
-    if (!team) {
-      throw new NotFoundException('team not found');
-    }
+  async addUser(team: Team, user: User): Promise<Team> {
     team.members.push(user);
     return await this.repository.save(team);
   }
 
-  async remove(id: number): Promise<Team> {
-    let team = await this.repository.findOne(id);
-    if (!team) {
-      throw new NotFoundException('team not found');
-    }
+  async remove(team: Team): Promise<Team> {
     return await this.repository.remove(team);
   }
 
-  async update(id: number, data: Partial<Team>): Promise<Team> {
-    let team = await this.repository.findOne(id);
-    if (!team) {
-      throw new NotFoundException('team not found');
-    }
+  async update(team: Team, data: Partial<Team>): Promise<Team> {
     Object.assign(team, data);
     return await this.repository.save(team);
   }

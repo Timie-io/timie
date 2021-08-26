@@ -12,6 +12,9 @@ export class Team {
   @Field()
   description: string;
 
+  @Field((type) => User)
+  owner: User;
+
   @Field((type) => [User], { nullable: true })
   members: User[];
 }

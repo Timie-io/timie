@@ -3,6 +3,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
@@ -17,6 +18,9 @@ export class Team {
 
   @Column()
   description: string;
+
+  @ManyToOne(() => User, (user) => user.ownedTeams)
+  owner: User;
 
   @ManyToMany(() => User, (user) => user.teams)
   @JoinTable()

@@ -2,7 +2,13 @@
  * User entity
  */
 
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Team } from '../teams/team.entity';
 
 @Entity()
@@ -24,6 +30,9 @@ export class User {
 
   @Column({ default: () => 'now()' })
   creationDate: Date;
+
+  @OneToMany(() => Team, (team) => team.owner)
+  ownedTeams: Team[];
 
   @ManyToMany(() => Team, (team) => team.members)
   teams: Team[];

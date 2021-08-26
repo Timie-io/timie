@@ -6,6 +6,7 @@ type Team {
   id: ID!
   name: String!
   description: String!
+  owner: User!
   members: [User!]
 }
 
@@ -27,4 +28,16 @@ type Query {
   loggedUser: User!
   team(id: ID!): Team!
   teams: [Team!]
+}
+
+type Mutation {
+  createTeam(data: NewTeamInput!): Team!
+  removeTeam(id: ID!): Team!
+  updateTeam(data: NewTeamInput!, id: ID!): Team!
+  addTeamMember(userId: ID!, teamId: ID!): Team!
+}
+
+input NewTeamInput {
+  name: String!
+  description: String!
 }
