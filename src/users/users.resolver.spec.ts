@@ -49,6 +49,7 @@ describe('UsersResolver', () => {
       creationDate: user.creationDate,
       isAdmin: user.isAdmin,
       password: user.password,
+      teams: [],
     };
     expect(await resolver.user('1', currentUser)).toEqual(user);
   });
@@ -61,6 +62,7 @@ describe('UsersResolver', () => {
       creationDate: user.creationDate,
       isAdmin: user.isAdmin,
       password: user.password,
+      teams: [],
     };
     try {
       await resolver.user('2', currentUser);
@@ -77,6 +79,7 @@ describe('UsersResolver', () => {
       creationDate: user.creationDate,
       isAdmin: true,
       password: user.password,
+      teams: [],
     };
     expect(await resolver.user('2', currentUser)).toEqual(user);
   });
@@ -93,6 +96,8 @@ describe('UsersResolver', () => {
     const returnedUser = { ...currentUser } as any;
     returnedUser['id'] = 1;
 
-    expect(await resolver.loggedUser(currentUser)).toEqual(returnedUser);
+    expect(await resolver.loggedUser({ ...currentUser, teams: [] })).toEqual(
+      returnedUser,
+    );
   });
 });

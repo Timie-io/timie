@@ -3,7 +3,14 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  ID,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { User } from '../users/models/user.model';
@@ -29,7 +36,10 @@ export class TeamsResolver {
 
   @Query((returns) => Team)
   @UseGuards(GqlAuthGuard)
-  async team(@Args('id') id: string, @CurrentUser() user: User) {
+  async team(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: User,
+  ) {
     const team = await this.teamsService.findOneById(parseInt(id), 'members');
     if (!team) {
       throw new NotFoundException('team not found');
@@ -43,7 +53,7 @@ export class TeamsResolver {
     return team;
   }
 
-  @Query((returns) => [Team])
+  @Query((returns) => [Team], { nullable: true })
   @UseGuards(GqlAuthGuard)
   async teams(@CurrentUser() user: User) {
     const currentUser = await this.usersService.findOneById(

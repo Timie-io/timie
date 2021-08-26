@@ -10,7 +10,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let usersService: Partial<UsersService>;
   let jwtService: Partial<JwtService>;
-  let user: User;
+  let user: Partial<User>;
   let password: string;
 
   beforeEach(async () => {
@@ -25,13 +25,13 @@ describe('AuthService', () => {
     };
     usersService = {
       findOneById: async (id: number): Promise<User> => {
-        return user;
+        return user as User;
       },
       findOneByEmail: async (email: string): Promise<User> => {
-        return user;
+        return user as User;
       },
       create: async (data: NewUserInput): Promise<User> => {
-        return user;
+        return user as User;
       },
     };
 
@@ -110,7 +110,7 @@ describe('AuthService', () => {
   });
 
   it('should login a user signing the email and the ID in a JWT', async () => {
-    const result = await service.login(user);
+    const result = await service.login(user as User);
     expect(result).toEqual({ access_token: jwtService.sign({}) });
   });
 });

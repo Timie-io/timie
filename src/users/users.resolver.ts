@@ -3,7 +3,14 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  ID,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { User } from './models/user.model';
@@ -15,7 +22,10 @@ export class UsersResolver {
 
   @Query((returns) => User)
   @UseGuards(GqlAuthGuard)
-  async user(@Args('id') id: string, @CurrentUser() user: User) {
+  async user(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: User,
+  ) {
     if (!(parseInt(user.id) === parseInt(id) || user.isAdmin)) {
       throw new UnauthorizedException();
     }

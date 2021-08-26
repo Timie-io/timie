@@ -22,7 +22,7 @@ describe('Users E2E Tests', () => {
   });
 
   const getUserByIdQuery = gql`
-    query getUserById($id: String!) {
+    query getUserById($id: ID!) {
       user(id: $id) {
         id
         name
@@ -83,6 +83,7 @@ describe('Users E2E Tests', () => {
           id: '1',
         },
       });
+    console.log(res);
     const {
       data: { user },
     } = res.body;

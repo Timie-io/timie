@@ -23,8 +23,8 @@ type User {
 scalar Date
 
 type Query {
-  user(id: String!): User!
+  user(id: ID!): User!
   loggedUser: User!
-  team(id: String!): Team!
-  teams: [Team!]!
+  team(id: ID!): Team!
+  teams: [Team!]
 }

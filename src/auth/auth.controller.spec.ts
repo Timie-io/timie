@@ -7,7 +7,7 @@ import { SignUpUser } from './dto/sign-up.user';
 describe('AuthController', () => {
   let controller: AuthController;
   let authService: Partial<AuthService>;
-  let user: User;
+  let user: Partial<User>;
   let tokenResponse: { access_token: string };
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('AuthController', () => {
         return tokenResponse;
       },
       signUp: async (body: SignUpUser): Promise<User> => {
-        return user;
+        return user as User;
       },
     };
 
