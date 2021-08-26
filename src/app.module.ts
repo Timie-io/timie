@@ -3,8 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import { ComplexityPlugin } from './common/plugins/complexity.plugin';
 import { TeamsModule } from './teams/teams.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -36,5 +37,6 @@ import { TeamsModule } from './teams/teams.module';
     AuthModule,
     TeamsModule,
   ],
+  providers: [ComplexityPlugin],
 })
 export class AppModule {}

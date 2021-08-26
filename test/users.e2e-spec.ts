@@ -83,7 +83,6 @@ describe('Users E2E Tests', () => {
           id: '1',
         },
       });
-    console.log(res);
     const {
       data: { user },
     } = res.body;
