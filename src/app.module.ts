@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ComplexityPlugin } from './common/plugins/complexity.plugin';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     AuthModule,
     TeamsModule,
+    ProjectsModule,
   ],
   providers: [ComplexityPlugin],
 })

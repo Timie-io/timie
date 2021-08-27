@@ -6,4 +6,5 @@ export const MockRepository = jest.fn(() => ({
   create: jest.fn((entity) => entity),
   save: jest.fn((entity) => entity),
   findOne: jest.fn((entity) => entity),
+  remove: jest.fn((entity) => entity),
 }));
