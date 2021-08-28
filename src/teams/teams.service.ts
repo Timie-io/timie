@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
-import { NewTeamInput } from './dto/new-team.input';
 import { Team } from './team.entity';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class TeamsService {
     return this.repository.findOne(query, { relations });
   }
 
-  async create(data: NewTeamInput, owner: User): Promise<Team> {
+  async create(data: Partial<Team>, owner: User): Promise<Team> {
     const team = this.repository.create(data);
     team.owner = owner;
     team.members = [owner]; // it's a member too
@@ -45,6 +45,14 @@ export class TeamsService {
 
   async update(team: Team, data: Partial<Team>): Promise<Team> {
     Object.assign(team, data);
+    return await this.repository.save(team);
+  }
+
+  async addProject(team: Team, project: Project): Promise<Team> {
+    if (!team.projects) {
+      team.projects = [];
+    }
+    team.projects.push(project);
     return await this.repository.save(team);
   }
 }

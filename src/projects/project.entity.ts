@@ -3,6 +3,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Team } from '../teams/team.entity';
@@ -20,6 +21,9 @@ export class Project {
 
   @Column({ default: () => 'now()' })
   creationDate: Date;
+
+  @ManyToOne(() => Team, (team) => team.ownedProjects)
+  owner: Team;
 
   @ManyToMany(() => Team, (team) => team.projects)
   @JoinTable()

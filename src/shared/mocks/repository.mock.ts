@@ -3,8 +3,9 @@ export const MockRepository = jest.fn(() => ({
     columns: [],
     relations: [],
   },
-  create: jest.fn((entity) => entity),
-  save: jest.fn((entity) => entity),
-  findOne: jest.fn((entity) => entity),
-  remove: jest.fn((entity) => entity),
+  create: jest.fn(),
+  save: jest.fn(),
+  findOne: jest.fn(),
+  remove: jest.fn(),
+  findAndCount: jest.fn(),
 }));

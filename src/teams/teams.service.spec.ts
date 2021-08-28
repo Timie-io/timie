@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Project } from '../projects/project.entity';
 import { MockType } from '../shared/mocks/mock.type';
 import { MockRepository } from '../shared/mocks/repository.mock';
 import { User } from '../users/user.entity';
@@ -32,6 +33,7 @@ describe('TeamsService', () => {
       password: 'hashedpassword',
       ownedTeams: [],
       teams: [],
+      projects: [],
     };
 
     service = module.get<TeamsService>(TeamsService);
@@ -63,6 +65,8 @@ describe('TeamsService', () => {
       description: 'An awesome team',
       owner: user,
       members: [],
+      ownedProjects: [],
+      projects: [],
     };
     repository.remove.mockReturnValue(output);
     expect(await service.remove(output)).toEqual(output);
@@ -75,6 +79,8 @@ describe('TeamsService', () => {
       description: 'An awesome team',
       owner: user,
       members: [],
+      ownedProjects: [],
+      projects: [],
     };
     const data = {
       name: 'Not Awesome Team',
@@ -121,6 +127,8 @@ describe('TeamsService', () => {
       description: 'An awesome team',
       owner: user,
       members: [],
+      ownedProjects: [],
+      projects: [],
     };
     const output = {
       id: 1,
@@ -128,9 +136,42 @@ describe('TeamsService', () => {
       description: 'An awesome team',
       owner: user,
       members: [user],
+      ownedProjects: [],
+      projects: [],
     };
+    repository.save.mockReturnValue(output);
     const result = await service.addUser(input, user);
     expect(input.members).toEqual([user]);
+    expect(result).toEqual(output);
+  });
+
+  it('should add a new project', async () => {
+    const project = {
+      id: 1,
+      name: 'My Project',
+      description: 'An awesome project',
+    } as Project;
+    const input = {
+      id: 1,
+      name: 'My Awesome Team',
+      description: 'An awesome team',
+      owner: user,
+      members: [],
+      ownedProjects: [],
+      projects: [],
+    };
+    const output = {
+      id: 1,
+      name: 'My Awesome Team',
+      description: 'An awesome team',
+      owner: user,
+      members: [],
+      ownedProjects: [],
+      projects: [project],
+    };
+    repository.save.mockReturnValue(output);
+    const result = await service.addProject(input, project);
+    expect(input.projects).toEqual([project]);
     expect(result).toEqual(output);
   });
 });

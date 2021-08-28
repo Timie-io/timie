@@ -9,6 +9,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Project } from '../projects/project.entity';
 import { Team } from '../teams/team.entity';
 
 @Entity()
@@ -36,4 +37,7 @@ export class User {
 
   @ManyToMany(() => Team, (team) => team.members)
   teams: Team[];
+
+  @OneToMany(() => Project, (project) => project.owner)
+  projects: Project[];
 }

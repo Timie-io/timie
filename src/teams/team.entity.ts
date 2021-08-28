@@ -4,6 +4,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Project } from '../projects/project.entity';
@@ -26,6 +27,9 @@ export class Team {
   @ManyToMany(() => User, (user) => user.teams)
   @JoinTable()
   members: User[];
+
+  @OneToMany(() => Project, (project) => project.owner)
+  ownedProjects: Project[];
 
   @ManyToMany(() => Project, (project) => project.teams)
   projects: Project[];
