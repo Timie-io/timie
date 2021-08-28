@@ -20,6 +20,7 @@ import { User } from '../users/models/user.model';
 import { User as UserEntity } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewTeamInput } from './dto/new-team.input';
+import { UpdateTeamInput } from './dto/update-team.input';
 import { Team } from './models/team.model';
 import { TeamsService } from './teams.service';
 
@@ -107,14 +108,16 @@ export class TeamsResolver {
     if (team.owner.id !== Number(user.id)) {
       throw new UnauthorizedException('action not allowed');
     }
-    return await this.teamsService.remove(team);
+    const copy = { ...team };
+    await this.teamsService.remove(team);
+    return copy;
   }
 
   @Mutation((returns) => Team)
   @UseGuards(GqlAuthGuard)
   async updateTeam(
     @Args('id', { type: () => ID }) id: string,
-    @Args('data') data: Partial<NewTeamInput>,
+    @Args('data') data: UpdateTeamInput,
     @CurrentUser() user: User,
   ) {
     const team = await this.teamsService.findOneById(parseInt(id), 'owner');

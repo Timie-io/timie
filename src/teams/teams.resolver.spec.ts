@@ -9,6 +9,7 @@ import { User as UserModel } from '../users/models/user.model';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewTeamInput } from './dto/new-team.input';
+import { UpdateTeamInput } from './dto/update-team.input';
 import { Team as TeamModel } from './models/team.model';
 import { Team } from './team.entity';
 import { TeamsResolver } from './teams.resolver';
@@ -182,9 +183,9 @@ describe('TeamsResolver', () => {
   });
 
   it('should update a team', async () => {
-    expect(await resolver.updateTeam(teamModel.id, {}, userModel)).toEqual(
-      team,
-    );
+    expect(
+      await resolver.updateTeam(teamModel.id, {} as UpdateTeamInput, userModel),
+    ).toEqual(team);
   });
 
   it('should throw a not found exception when trying updating an unexisting team', async () => {
@@ -192,7 +193,7 @@ describe('TeamsResolver', () => {
       return null;
     };
     try {
-      await resolver.updateTeam(teamModel.id, {}, userModel);
+      await resolver.updateTeam(teamModel.id, {} as UpdateTeamInput, userModel);
     } catch (err) {
       expect(err).toBeInstanceOf(NotFoundException);
       expect(err.message).toEqual('team does not exist');
@@ -202,7 +203,7 @@ describe('TeamsResolver', () => {
   it('should throw an unauthorized exception when trying updating a not ownered team', async () => {
     teamModel.owner = null;
     try {
-      await resolver.updateTeam(teamModel.id, {}, userModel);
+      await resolver.updateTeam(teamModel.id, {} as UpdateTeamInput, userModel);
     } catch (err) {
       expect(err).toBeInstanceOf(UnauthorizedException);
       expect(err.message).toEqual('action not allowed');
