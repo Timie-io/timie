@@ -114,7 +114,7 @@ export class TeamsResolver {
   @UseGuards(GqlAuthGuard)
   async updateTeam(
     @Args('id', { type: () => ID }) id: string,
-    @Args('data') data: NewTeamInput,
+    @Args('data') data: Partial<NewTeamInput>,
     @CurrentUser() user: User,
   ) {
     const team = await this.teamsService.findOneById(parseInt(id), 'owner');
