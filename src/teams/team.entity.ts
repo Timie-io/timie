@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
 
 @Entity()
@@ -25,4 +26,7 @@ export class Team {
   @ManyToMany(() => User, (user) => user.teams)
   @JoinTable()
   members: User[];
+
+  @ManyToMany(() => Project, (project) => project.teams)
+  projects: Project[];
 }
