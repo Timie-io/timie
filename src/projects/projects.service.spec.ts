@@ -44,7 +44,6 @@ describe('ProjectsService', () => {
       description: 'A super awesome team',
       owner: user,
       members: [user],
-      ownedProjects: [],
       projects: [],
     };
 
@@ -53,8 +52,8 @@ describe('ProjectsService', () => {
       name: 'My Awesome Project',
       description: 'A super awesome project',
       creationDate: new Date(),
-      owner: team,
-      teams: [team],
+      owner: user,
+      team: team,
     };
 
     service = module.get<ProjectsService>(ProjectsService);
@@ -73,6 +72,7 @@ describe('ProjectsService', () => {
       await service.create(
         { name: project.name, description: project.description },
         team,
+        user,
       ),
     ).toEqual(project);
   });
@@ -80,6 +80,15 @@ describe('ProjectsService', () => {
   it('should find one by ID', async () => {
     repository.findOne.mockReturnValue(project);
     expect(await service.findOneById(1)).toEqual(project);
+  });
+
+  it('should list all projects', async () => {
+    const result = [
+      { ...project, id: 1, name: 'Team Awesome 1' },
+      { ...project, id: 2, name: 'Team Awesome 2' },
+    ];
+    repository.findAndCount.mockReturnValue([result, 2]);
+    expect(await service.findAll(0, 25)).toEqual([result, 2]);
   });
 
   it('should find all by name', async () => {

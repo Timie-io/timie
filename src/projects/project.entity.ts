@@ -1,12 +1,6 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Team } from '../teams/team.entity';
+import { User } from '../users/user.entity';
 
 @Entity()
 export class Project {
@@ -22,10 +16,9 @@ export class Project {
   @Column({ default: () => 'now()' })
   creationDate: Date;
 
-  @ManyToOne(() => Team, (team) => team.ownedProjects)
-  owner: Team;
+  @ManyToOne(() => User, (user) => user.projects)
+  owner: User;
 
-  @ManyToMany(() => Team, (team) => team.projects)
-  @JoinTable()
-  teams: Team[];
+  @ManyToOne(() => Team, (team) => team.projects, { nullable: true })
+  team: Team;
 }

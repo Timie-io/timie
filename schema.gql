@@ -2,12 +2,22 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Project {
+  id: ID!
+  name: String!
+  description: String!
+  owner: User!
+  team: Team!
+}
+
 type Team {
   id: ID!
   name: String!
   description: String!
   owner: User!
   members: [User!]
+  ownedProjects: [Project!]
+  projects: [Project!]
 }
 
 type User {
@@ -17,17 +27,29 @@ type User {
   creationDate: Date!
   password: String!
   isAdmin: Boolean!
+  ownedTeams: [Team!]
   teams: [Team!]
 }
 
 """Date custom scalar type"""
 scalar Date
 
+type ProjectsResult {
+  result: [Project!]!
+  total: Int!
+}
+
 type Query {
   user(id: ID!): User!
   loggedUser: User!
   team(id: ID!): Team!
   teams: [Team!]
+  myTeams: [Team!]
+  project(id: ID!): Project!
+  projects(skip: Int = 0, take: Int = 25): ProjectsResult!
+  myProjects: [Project!]
+  projectsByTeamId(teamId: ID!): [Project!]
+  projectsByName(skip: Int = 0, take: Int = 25, name: String!): ProjectsResult
 }
 
 type Mutation {
@@ -35,6 +57,9 @@ type Mutation {
   removeTeam(id: ID!): Team!
   updateTeam(data: UpdateTeamInput!, id: ID!): Team!
   addTeamMember(userId: ID!, teamId: ID!): Team!
+  createProject(teamId: ID, data: NewProjectInput!): Project!
+  updateProject(data: UpdateProjectInput!, id: ID!): Project!
+  removeProject(id: ID!): Project!
 }
 
 input NewTeamInput {
@@ -43,6 +68,16 @@ input NewTeamInput {
 }
 
 input UpdateTeamInput {
+  name: String
+  description: String
+}
+
+input NewProjectInput {
+  name: String!
+  description: String!
+}
+
+input UpdateProjectInput {
   name: String
   description: String
 }

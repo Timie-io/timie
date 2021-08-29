@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ForbiddenException,
   NotFoundException,
   UnauthorizedException,
   UseGuards,
@@ -17,7 +16,6 @@ import {
 import { CurrentUser } from '../auth/current-user.decorator';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { User } from '../users/models/user.model';
-import { User as UserEntity } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewTeamInput } from './dto/new-team.input';
 import { UpdateTeamInput } from './dto/update-team.input';
@@ -59,18 +57,18 @@ export class TeamsResolver {
     if (!team) {
       throw new NotFoundException('team not found');
     }
-    const members = team.members.filter((member) => {
-      return member.id === Number(user.id);
-    });
-    if (members.length === 0) {
-      throw new ForbiddenException('not a member');
-    }
     return team;
   }
 
   @Query((returns) => [Team], { nullable: true })
   @UseGuards(GqlAuthGuard)
-  async teams(@CurrentUser() user: User) {
+  async teams() {
+    return await this.teamsService.findAll();
+  }
+
+  @Query((returns) => [Team], { nullable: true })
+  @UseGuards(GqlAuthGuard)
+  async myTeams(@CurrentUser() user: User) {
     const currentUser = await this.usersService.findOneById(
       parseInt(user.id),
       'teams',
@@ -91,7 +89,7 @@ export class TeamsResolver {
     if (team) {
       throw new BadRequestException('team with same name already exists');
     }
-    const owner = { ...user, id: Number(user.id), teams: [] } as UserEntity;
+    const owner = await this.usersService.findOneById(Number(user.id));
     return await this.teamsService.create(data, owner);
   }
 
@@ -139,10 +137,14 @@ export class TeamsResolver {
   ) {
     const team = await this.teamsService.findOneById(
       parseInt(teamId),
+      'owner',
       'members',
     );
     if (!team) {
       throw new NotFoundException('team does not exist');
+    }
+    if (team.owner.id !== Number(user.id)) {
+      throw new UnauthorizedException('action not allowed');
     }
     const member = await this.usersService.findOneById(parseInt(userId));
     if (!member) {

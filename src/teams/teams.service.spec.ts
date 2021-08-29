@@ -120,6 +120,27 @@ describe('TeamsService', () => {
     expect(await service.findOneByName('My Awesome Team')).toEqual(output);
   });
 
+  it('should list all teams', async () => {
+    const output = [
+      {
+        id: 1,
+        name: 'My Awesome Team',
+        description: 'An awesome team',
+        owner: user,
+        members: [],
+      },
+      {
+        id: 2,
+        name: 'My Awesome Team 2',
+        description: 'Another awesome team',
+        owner: user,
+        members: [],
+      },
+    ];
+    repository.find.mockReturnValue(output);
+    expect(await service.findAll()).toEqual(output);
+  });
+
   it('should add a user as a team member', async () => {
     const input = {
       id: 1,

@@ -29,8 +29,5 @@ export class Team {
   members: User[];
 
   @OneToMany(() => Project, (project) => project.owner)
-  ownedProjects: Project[];
-
-  @ManyToMany(() => Project, (project) => project.teams)
   projects: Project[];
 }

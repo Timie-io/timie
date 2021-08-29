@@ -54,4 +54,13 @@ export class UsersResolver {
     );
     return teams;
   }
+
+  @ResolveField()
+  async ownedTeams(@Parent() user: User) {
+    const { ownedTeams } = await this.usersService.findOneById(
+      parseInt(user.id),
+      'ownedTeams',
+    );
+    return ownedTeams;
+  }
 }

@@ -22,5 +22,8 @@ export class User {
   isAdmin: boolean;
 
   @Field((type) => [Team], { nullable: true })
+  ownedTeams: Team[];
+
+  @Field((type) => [Team], { nullable: true })
   teams: Team[];
 }

@@ -50,6 +50,7 @@ describe('UsersResolver', () => {
       isAdmin: user.isAdmin,
       password: user.password,
       teams: [],
+      ownedTeams: [],
     };
     expect(await resolver.user('1', currentUser)).toEqual(user);
   });
@@ -63,6 +64,7 @@ describe('UsersResolver', () => {
       isAdmin: user.isAdmin,
       password: user.password,
       teams: [],
+      ownedTeams: [],
     };
     try {
       await resolver.user('2', currentUser);
@@ -80,6 +82,7 @@ describe('UsersResolver', () => {
       isAdmin: true,
       password: user.password,
       teams: [],
+      ownedTeams: [],
     };
     expect(await resolver.user('2', currentUser)).toEqual(user);
   });
@@ -96,8 +99,52 @@ describe('UsersResolver', () => {
     const returnedUser = { ...currentUser } as any;
     returnedUser['id'] = 1;
 
-    expect(await resolver.loggedUser({ ...currentUser, teams: [] })).toEqual(
-      returnedUser,
+    expect(
+      await resolver.loggedUser({ ...currentUser, teams: [], ownedTeams: [] }),
+    ).toEqual(returnedUser);
+  });
+
+  it('should resolve all teams where I am a member', async () => {
+    const currentUser = {
+      id: '1',
+      name: user.name,
+      email: user.email,
+      creationDate: user.creationDate,
+      isAdmin: false,
+      password: user.password,
+      ownedTeams: [],
+      teams: [],
+    };
+    const returnedUser = { ...currentUser, id: 1 } as any;
+    returnedUser['teams'] = [
+      { name: 'Awesome team', description: 'An Awesome team' },
+    ];
+    usersService.findOneById = async (id, ...relations) => {
+      return returnedUser;
+    };
+    expect(await resolver.teams(currentUser)).toEqual(returnedUser['teams']);
+  });
+
+  it('should resolve all my owned teams', async () => {
+    const currentUser = {
+      id: '1',
+      name: user.name,
+      email: user.email,
+      creationDate: user.creationDate,
+      isAdmin: false,
+      password: user.password,
+      ownedTeams: [],
+      teams: [],
+    };
+    const returnedUser = { ...currentUser, id: 1 } as any;
+    returnedUser['ownedTeams'] = [
+      { name: 'Awesome team', description: 'An Awesome team' },
+    ];
+    usersService.findOneById = async (id, ...relations) => {
+      return returnedUser;
+    };
+    expect(await resolver.ownedTeams(currentUser)).toEqual(
+      returnedUser['ownedTeams'],
     );
   });
 });

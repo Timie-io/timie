@@ -42,18 +42,24 @@ describe('TeamsResolver', () => {
       description: 'An awesome team',
       owner: user as User,
       members: [user as User],
+      projects: [],
     };
 
-    userModel = { ...user, id: '1', teams: [] } as UserModel;
+    userModel = { ...user, id: '1', teams: [], ownedTeams: [] } as UserModel;
 
     teamModel = {
       ...team,
       id: '1',
       members: [],
       owner: userModel,
+      projects: [],
+      ownedProjects: [],
     } as TeamModel;
 
     teamsService = {
+      async findAll() {
+        return [team as Team];
+      },
       async findOneById(id: number, ...relations: string[]): Promise<Team> {
         return team as Team;
       },
@@ -135,9 +141,14 @@ describe('TeamsResolver', () => {
     }
   });
 
-  it('it should resolve the current user teams', async () => {
+  it('it should resolve all the teams', async () => {
     user.teams = [team as Team];
-    expect(await resolver.teams(userModel)).toEqual([team]);
+    expect(await resolver.teams()).toEqual([team]);
+  });
+
+  it('should resolve all my teams', async () => {
+    user.teams = [team as Team];
+    expect(await resolver.myTeams(userModel)).toEqual([team]);
   });
 
   it('should create a team', async () => {
@@ -228,7 +239,7 @@ describe('TeamsResolver', () => {
     }
   });
 
-  it('should throw a bad request exception when trying addin as a new member an unexisting user', async () => {
+  it('should throw a bad request exception when trying adding as a new member an unexisting user', async () => {
     usersService.findOneById = (id, ...relations) => {
       return null;
     };

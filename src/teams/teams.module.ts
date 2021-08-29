@@ -8,5 +8,6 @@ import { TeamsService } from './teams.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Team]), UsersModule],
   providers: [TeamsService, TeamsResolver],
+  exports: [TeamsService],
 })
 export class TeamsModule {}

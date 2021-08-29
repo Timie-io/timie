@@ -11,6 +11,10 @@ export class TeamsService {
     @InjectRepository(Team) private readonly repository: Repository<Team>,
   ) {}
 
+  async findAll(): Promise<Team[]> {
+    return this.repository.find();
+  }
+
   async findOneById(
     id: number,
     ...relations: string[]
