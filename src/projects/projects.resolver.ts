@@ -68,7 +68,10 @@ export class ProjectsResolver {
   @Query((returns) => [Project], { nullable: true })
   @UseGuards(GqlAuthGuard)
   async myProjects(@CurrentUser() user: User) {
-    const currentUser = await this.usersService.findOneById(Number(user.id));
+    const currentUser = await this.usersService.findOneById(
+      Number(user.id),
+      'projects',
+    );
     return currentUser.projects;
   }
 
