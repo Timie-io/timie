@@ -20,8 +20,5 @@ export class Team {
   members: User[];
 
   @Field((type) => [Project], { nullable: true })
-  ownedProjects: Project[];
-
-  @Field((type) => [Project], { nullable: true })
   projects: Project[];
 }

@@ -13,9 +13,12 @@ export class Project {
   @Field()
   description: string;
 
+  @Field()
+  creationDate: Date;
+
   @Field((type) => User)
   owner: User;
 
-  @Field((type) => Team)
+  @Field((type) => Team, { nullable: true })
   team: Team;
 }

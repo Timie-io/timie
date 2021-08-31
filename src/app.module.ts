@@ -4,9 +4,10 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ComplexityPlugin } from './common/plugins/complexity.plugin';
+import { ProjectsModule } from './projects/projects.module';
+import { TasksModule } from './tasks/tasks.module';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
-import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -17,6 +18,22 @@ import { ProjectsModule } from './projects/projects.module';
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
       autoSchemaFile: 'schema.gql',
+      context: ({ req, connection }) => {
+        // subscriptions
+        if (connection) {
+          return {
+            req: {
+              headers: {
+                authorization: connection.context['Authorization']
+                  ? connection.context['Authorization']
+                  : connection.context['authorization'],
+              },
+            },
+          };
+        }
+        // queries and mutations
+        return { req };
+      },
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -38,6 +55,7 @@ import { ProjectsModule } from './projects/projects.module';
     AuthModule,
     TeamsModule,
     ProjectsModule,
+    TasksModule,
   ],
   providers: [ComplexityPlugin],
 })

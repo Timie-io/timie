@@ -38,6 +38,8 @@ describe('ProjectsResolver', () => {
       id: '1',
       ownedTeams: [],
       teams: [],
+      tasks: [],
+      myTasks: [],
     } as UserModel;
 
     team = {
@@ -152,27 +154,6 @@ describe('ProjectsResolver', () => {
     ];
     user.projects = projects;
     expect(await resolver.myProjects(userModel)).toEqual(projects);
-  });
-
-  it('should resolve a list of projects for a given team', async () => {
-    const output = [
-      project as Project,
-      { ...project, id: 2, name: 'Another Project' } as Project,
-    ];
-    team.projects = output;
-    expect(await resolver.projectsByTeamId('1')).toEqual(output);
-  });
-
-  it('should throw a team not found error when asking for a teams projects', async () => {
-    teamsService.findOneById = async (id) => {
-      return null;
-    };
-    try {
-      await resolver.projectsByTeamId('1');
-    } catch (err) {
-      expect(err).toBeInstanceOf(NotFoundException);
-      expect(err.message).toEqual('team not found');
-    }
   });
 
   it('should resolve a list of projects by name', async () => {

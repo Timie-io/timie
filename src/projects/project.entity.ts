@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Task } from '../tasks/task.entity';
 import { Team } from '../teams/team.entity';
 import { User } from '../users/user.entity';
 
@@ -21,4 +28,7 @@ export class Project {
 
   @ManyToOne(() => Team, (team) => team.projects, { nullable: true })
   team: Team;
+
+  @OneToMany(() => Task, (task) => task.project)
+  tasks: Task[];
 }

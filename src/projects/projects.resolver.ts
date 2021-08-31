@@ -42,6 +42,15 @@ export class ProjectsResolver {
     return projectEntity.owner;
   }
 
+  @ResolveField()
+  async team(@Parent() project: Project) {
+    const projectEntity = await this.projectsService.findOneById(
+      Number(project.id),
+      'team',
+    );
+    return projectEntity.team;
+  }
+
   @Query((returns) => Project)
   @UseGuards(GqlAuthGuard)
   async project(@Args('id', { type: () => ID }) id: string) {
@@ -73,19 +82,6 @@ export class ProjectsResolver {
       'projects',
     );
     return currentUser.projects;
-  }
-
-  @Query((returns) => [Project], { nullable: true })
-  @UseGuards(GqlAuthGuard)
-  async projectsByTeamId(@Args('teamId', { type: () => ID }) teamId: string) {
-    const team = await this.teamsService.findOneById(
-      parseInt(teamId),
-      'projects',
-    );
-    if (!team) {
-      throw new NotFoundException('team not found');
-    }
-    return team.projects;
   }
 
   @Query((returns) => ProjectsResult, { nullable: true })

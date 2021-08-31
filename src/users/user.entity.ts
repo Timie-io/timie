@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Project } from '../projects/project.entity';
+import { Task } from '../tasks/task.entity';
 import { Team } from '../teams/team.entity';
 
 @Entity()
@@ -40,4 +41,10 @@ export class User {
 
   @OneToMany(() => Project, (project) => project.owner)
   projects: Project[];
+
+  @ManyToMany(() => Task, (task) => task.followers)
+  tasks: Task[];
+
+  @OneToMany(() => Task, (task) => task.creator)
+  myTasks: Task[];
 }

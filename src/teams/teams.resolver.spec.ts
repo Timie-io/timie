@@ -45,7 +45,14 @@ describe('TeamsResolver', () => {
       projects: [],
     };
 
-    userModel = { ...user, id: '1', teams: [], ownedTeams: [] } as UserModel;
+    userModel = {
+      ...user,
+      id: '1',
+      teams: [],
+      ownedTeams: [],
+      tasks: [],
+      myTasks: [],
+    } as UserModel;
 
     teamModel = {
       ...team,
@@ -53,7 +60,6 @@ describe('TeamsResolver', () => {
       members: [],
       owner: userModel,
       projects: [],
-      ownedProjects: [],
     } as TeamModel;
 
     teamsService = {

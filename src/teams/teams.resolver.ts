@@ -47,6 +47,15 @@ export class TeamsResolver {
     return members;
   }
 
+  @ResolveField()
+  async projects(@Parent() team: Team) {
+    const teamEntity = await this.teamsService.findOneById(
+      Number(team.id),
+      'projects',
+    );
+    return team.projects;
+  }
+
   @Query((returns) => Team)
   @UseGuards(GqlAuthGuard)
   async team(

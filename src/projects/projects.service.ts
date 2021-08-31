@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { CurrentUser } from '../auth/current-user.decorator';
 import { Team } from '../teams/team.entity';
 import { User } from '../users/user.entity';
 import { Project } from './project.entity';
@@ -17,7 +16,7 @@ export class ProjectsService {
     ...relations: string[]
   ): Promise<Project | undefined> {
     const query = { id: id };
-    return this.repository.findOne(query, { relations });
+    return await this.repository.findOne(query, { relations });
   }
 
   async findAll(
@@ -25,7 +24,7 @@ export class ProjectsService {
     take: number,
     ...relations: string[]
   ): Promise<[Project[], number]> {
-    return this.repository.findAndCount({
+    return await this.repository.findAndCount({
       skip: skip,
       take: take,
       relations,
@@ -38,7 +37,7 @@ export class ProjectsService {
     take: number,
     ...relations: string[]
   ): Promise<[Project[], number]> {
-    return this.repository.findAndCount({
+    return await this.repository.findAndCount({
       where: { name: ILike(`%${name}%`) },
       skip: skip,
       take: take,
@@ -49,7 +48,7 @@ export class ProjectsService {
   async create(
     data: Partial<Project>,
     team: Team,
-    @CurrentUser() user: User,
+    user: User,
   ): Promise<Project> {
     const project = this.repository.create(data);
     project.owner = user;

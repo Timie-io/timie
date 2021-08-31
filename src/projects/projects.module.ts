@@ -7,6 +7,7 @@ import { ProjectsResolver } from './projects.resolver';
 import { ProjectsService } from './projects.service';
 
 @Module({
+  exports: [ProjectsService],
   imports: [TypeOrmModule.forFeature([Project]), UsersModule, TeamsModule],
   providers: [ProjectsService, ProjectsResolver],
 })

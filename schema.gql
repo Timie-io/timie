@@ -2,22 +2,37 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Project {
-  id: ID!
-  name: String!
-  description: String!
-  owner: User!
-  team: Team!
-}
-
 type Team {
   id: ID!
   name: String!
   description: String!
   owner: User!
   members: [User!]
-  ownedProjects: [Project!]
   projects: [Project!]
+}
+
+type Project {
+  id: ID!
+  name: String!
+  description: String!
+  creationDate: Date!
+  owner: User!
+  team: Team
+}
+
+"""Date custom scalar type"""
+scalar Date
+
+type Task {
+  id: ID!
+  title: String!
+  description: String!
+  priority: Float!
+  creationDate: Date!
+  project: Project!
+  active: Boolean!
+  creator: User!
+  followers: [User!]!
 }
 
 type User {
@@ -29,13 +44,17 @@ type User {
   isAdmin: Boolean!
   ownedTeams: [Team!]
   teams: [Team!]
+  tasks: [Task!]
+  myTasks: [Task!]
 }
-
-"""Date custom scalar type"""
-scalar Date
 
 type ProjectsResult {
   result: [Project!]!
+  total: Int!
+}
+
+type TasksResult {
+  result: [Task!]!
   total: Int!
 }
 
@@ -48,8 +67,9 @@ type Query {
   project(id: ID!): Project!
   projects(skip: Int = 0, take: Int = 25): ProjectsResult!
   myProjects: [Project!]
-  projectsByTeamId(teamId: ID!): [Project!]
   projectsByName(skip: Int = 0, take: Int = 25, name: String!): ProjectsResult
+  task(id: ID!): Task!
+  tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean): TasksResult!
 }
 
 type Mutation {
@@ -60,6 +80,10 @@ type Mutation {
   createProject(teamId: ID, data: NewProjectInput!): Project!
   updateProject(data: UpdateProjectInput!, id: ID!): Project!
   removeProject(id: ID!): Project!
+  createTask(data: NewTaskInput!): Task!
+  updateTask(data: UpdateTaskInput!, id: ID!): Task!
+  removeTask(id: ID!): Task!
+  addTaskFollower(userId: ID!, id: ID!): Task!
 }
 
 input NewTeamInput {
@@ -80,4 +104,24 @@ input NewProjectInput {
 input UpdateProjectInput {
   name: String
   description: String
+}
+
+input NewTaskInput {
+  title: String!
+  description: String
+  priority: Float = 0
+  active: Boolean
+  projectId: ID!
+}
+
+input UpdateTaskInput {
+  title: String
+  description: String
+  priority: Float
+  active: Boolean
+}
+
+type Subscription {
+  taskAdded: Task!
+  taskRemoved: Task!
 }

@@ -63,4 +63,22 @@ export class UsersResolver {
     );
     return ownedTeams;
   }
+
+  @ResolveField()
+  async tasks(@Parent() user: User) {
+    const { tasks } = await this.usersService.findOneById(
+      Number(user.id),
+      'tasks',
+    );
+    return tasks;
+  }
+
+  @ResolveField()
+  async myTasks(@Parent() user: User) {
+    const { myTasks } = await this.usersService.findOneById(
+      Number(user.id),
+      'tasks',
+    );
+    return myTasks;
+  }
 }

@@ -34,6 +34,8 @@ describe('TeamsService', () => {
       ownedTeams: [],
       teams: [],
       projects: [],
+      tasks: [],
+      myTasks: [],
     };
 
     service = module.get<TeamsService>(TeamsService);

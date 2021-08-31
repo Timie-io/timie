@@ -36,6 +36,8 @@ describe('ProjectsService', () => {
       ownedTeams: [],
       teams: [],
       projects: [],
+      tasks: [],
+      myTasks: [],
     };
 
     team = {
@@ -54,6 +56,7 @@ describe('ProjectsService', () => {
       creationDate: new Date(),
       owner: user,
       team: team,
+      tasks: [],
     };
 
     service = module.get<ProjectsService>(ProjectsService);
