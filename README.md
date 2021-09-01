@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="timie-logo.svg" width="320" alt="Timie Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="timie-logo.png" width="320" alt="Timie Logo" /></a>
 </p>
 
 ## Description
