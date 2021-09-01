@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Team } from '../teams/team.entity';
 import { User } from '../users/user.entity';
+import { ProjectsFindArgs } from './dto/projects-find.args';
 import { Project } from './project.entity';
 
 @Injectable()
@@ -20,29 +21,25 @@ export class ProjectsService {
   }
 
   async findAll(
-    skip: number,
-    take: number,
+    args: ProjectsFindArgs,
     ...relations: string[]
   ): Promise<[Project[], number]> {
-    return await this.repository.findAndCount({
-      skip: skip,
-      take: take,
+    const filter = {
+      where: {},
+      skip: args.skip,
+      take: args.take,
       relations,
-    });
-  }
-
-  async findAllByName(
-    name: string,
-    skip: number,
-    take: number,
-    ...relations: string[]
-  ): Promise<[Project[], number]> {
-    return await this.repository.findAndCount({
-      where: { name: ILike(`%${name}%`) },
-      skip: skip,
-      take: take,
-      relations,
-    });
+    };
+    if (args.name) {
+      Object.assign(filter.where, { name: ILike(`%${args.name}%`) });
+    }
+    if (args.ownerId) {
+      Object.assign(filter.where, { ownerId: args.ownerId });
+    }
+    if (args.teamId) {
+      Object.assign(filter.where, { teamId: args.teamId });
+    }
+    return await this.repository.findAndCount(filter);
   }
 
   async create(

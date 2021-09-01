@@ -6,6 +6,7 @@ import { User as UserModel } from '../users/models/user.model';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewProjectInput } from './dto/new-project-input';
+import { ProjectsFindArgs } from './dto/projects-find.args';
 import { UpdateProjectInput } from './dto/update-project.input';
 import { Project } from './project.entity';
 import { ProjectsResolver } from './projects.resolver';
@@ -40,6 +41,7 @@ describe('ProjectsResolver', () => {
       teams: [],
       tasks: [],
       myTasks: [],
+      assignments: [],
     } as UserModel;
 
     team = {
@@ -85,10 +87,7 @@ describe('ProjectsResolver', () => {
       async findOneById(id, ...relations) {
         return project as Project;
       },
-      async findAllByName(name, skip, take, ...relations) {
-        return [[project as Project], 1];
-      },
-      async findAll(skip, take, ...relations) {
+      async findAll(args, ...relations) {
         return [[project as Project], 1];
       },
     };
@@ -141,7 +140,8 @@ describe('ProjectsResolver', () => {
     projectsService.findAll = async (skip, take, ...relations) => {
       return [projects, 2];
     };
-    expect(await resolver.projects({ skip: 0, take: 25 })).toEqual({
+    const args: Partial<ProjectsFindArgs> = { skip: 0, take: 25 };
+    expect(await resolver.projects(args as ProjectsFindArgs)).toEqual({
       result: projects,
       total: 2,
     });
@@ -154,22 +154,6 @@ describe('ProjectsResolver', () => {
     ];
     user.projects = projects;
     expect(await resolver.myProjects(userModel)).toEqual(projects);
-  });
-
-  it('should resolve a list of projects by name', async () => {
-    const projects = [
-      project as Project,
-      { ...project, id: 2, name: 'Another Project' } as Project,
-    ];
-    projectsService.findAllByName = async (name, skip, take, ...relations) => {
-      return [projects, 2];
-    };
-    expect(
-      await resolver.projectsByName('awesome', { skip: 0, take: 25 }),
-    ).toEqual({
-      result: projects,
-      total: 2,
-    });
   });
 
   it('should create a new project', async () => {

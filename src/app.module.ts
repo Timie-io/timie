@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
 import { ComplexityPlugin } from './common/plugins/complexity.plugin';
 import { ProjectsModule } from './projects/projects.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
+import { StatusModule } from './status/status.module';
 
 @Module({
   imports: [
@@ -18,6 +20,9 @@ import { UsersModule } from './users/users.module';
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
       autoSchemaFile: 'schema.gql',
+      buildSchemaOptions: {
+        numberScalarMode: 'integer',
+      },
       context: ({ req, connection }) => {
         // subscriptions
         if (connection) {
@@ -56,6 +61,8 @@ import { UsersModule } from './users/users.module';
     TeamsModule,
     ProjectsModule,
     TasksModule,
+    AssignmentsModule,
+    StatusModule,
   ],
   providers: [ComplexityPlugin],
 })

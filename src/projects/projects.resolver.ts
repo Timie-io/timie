@@ -14,12 +14,12 @@ import {
 } from '@nestjs/graphql';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
-import { FindArgs } from '../shared/dto/find.args';
 import { Team } from '../teams/team.entity';
 import { TeamsService } from '../teams/teams.service';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
 import { NewProjectInput } from './dto/new-project-input';
+import { ProjectsFindArgs } from './dto/projects-find.args';
 import { UpdateProjectInput } from './dto/update-project.input';
 import { Project } from './models/project.model';
 import { ProjectsResult } from './models/projects-result.model';
@@ -63,11 +63,8 @@ export class ProjectsResolver {
 
   @Query((returns) => ProjectsResult)
   @UseGuards(GqlAuthGuard)
-  async projects(@Args() args: FindArgs) {
-    const [result, total] = await this.projectsService.findAll(
-      args.skip,
-      args.take,
-    );
+  async projects(@Args() args: ProjectsFindArgs) {
+    const [result, total] = await this.projectsService.findAll(args);
     return {
       result,
       total,
@@ -82,20 +79,6 @@ export class ProjectsResolver {
       'projects',
     );
     return currentUser.projects;
-  }
-
-  @Query((returns) => ProjectsResult, { nullable: true })
-  @UseGuards(GqlAuthGuard)
-  async projectsByName(@Args('name') name: string, @Args() args: FindArgs) {
-    const [result, total] = await this.projectsService.findAllByName(
-      name,
-      args.skip,
-      args.take,
-    );
-    return {
-      result,
-      total,
-    };
   }
 
   @Mutation((returns) => Project)

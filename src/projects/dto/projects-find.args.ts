@@ -2,13 +2,13 @@ import { ArgsType, Field, ID } from '@nestjs/graphql';
 import { FindArgs } from '../../shared/dto/find.args';
 
 @ArgsType()
-export class TaskFindArgs extends FindArgs {
+export class ProjectsFindArgs extends FindArgs {
   @Field({ nullable: true })
-  title: string;
+  name: string;
 
   @Field((type) => ID, { nullable: true })
-  projectId: string;
+  ownerId: string;
 
-  @Field({ nullable: true })
-  active: boolean;
+  @Field((type) => ID, { nullable: true })
+  teamId: string;
 }

@@ -18,8 +18,10 @@ import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
 import { NewTeamInput } from './dto/new-team.input';
+import { TeamsFindArgs } from './dto/teams-find.args';
 import { UpdateTeamInput } from './dto/update-team.input';
 import { Team } from './models/team.model';
+import { TeamsResult } from './models/teams-result.model';
 import { TeamsService } from './teams.service';
 
 @Resolver((of) => Team)
@@ -62,17 +64,21 @@ export class TeamsResolver {
     @Args('id', { type: () => ID }) id: string,
     @CurrentUser() user: User,
   ) {
-    const team = await this.teamsService.findOneById(parseInt(id), 'members');
+    const team = await this.teamsService.findOneById(parseInt(id));
     if (!team) {
       throw new NotFoundException('team not found');
     }
     return team;
   }
 
-  @Query((returns) => [Team], { nullable: true })
+  @Query((returns) => TeamsResult, { nullable: true })
   @UseGuards(GqlAuthGuard)
-  async teams() {
-    return await this.teamsService.findAll();
+  async teams(@Args() args: TeamsFindArgs) {
+    const [result, total] = await this.teamsService.findAll(args);
+    return {
+      result,
+      total,
+    };
   }
 
   @Query((returns) => [Team], { nullable: true })

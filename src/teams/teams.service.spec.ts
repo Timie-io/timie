@@ -5,13 +5,14 @@ import { Project } from '../projects/project.entity';
 import { MockType } from '../shared/mocks/mock.type';
 import { MockRepository } from '../shared/mocks/repository.mock';
 import { User } from '../users/user.entity';
+import { TeamsFindArgs } from './dto/teams-find.args';
 import { Team } from './team.entity';
 import { TeamsService } from './teams.service';
 
 describe('TeamsService', () => {
   let service: TeamsService;
   let repository: MockType<Repository<Team>>;
-  let user: User;
+  let user: Partial<User>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,31 +58,29 @@ describe('TeamsService', () => {
     };
     repository.create.mockReturnValue(input);
     repository.save.mockReturnValue(output);
-    expect(await service.create(input, user)).toEqual(output);
+    expect(await service.create(input, user as User)).toEqual(output);
   });
 
   it('should remove a team', async () => {
-    const output = {
+    const output: Partial<Team> = {
       id: 1,
       name: 'My Awesome Team',
       description: 'An awesome team',
-      owner: user,
+      owner: user as User,
       members: [],
-      ownedProjects: [],
       projects: [],
     };
     repository.remove.mockReturnValue(output);
-    expect(await service.remove(output)).toEqual(output);
+    expect(await service.remove(output as Team)).toEqual(output);
   });
 
   it('should update a team', async () => {
-    const team = {
+    const team: Partial<Team> = {
       id: 1,
       name: 'My Awesome Team',
       description: 'An awesome team',
-      owner: user,
+      owner: user as User,
       members: [],
-      ownedProjects: [],
       projects: [],
     };
     const data = {
@@ -93,7 +92,7 @@ describe('TeamsService', () => {
       ...data,
     };
     repository.save.mockReturnValue(output);
-    expect(await service.update(team, data)).toEqual(output);
+    expect(await service.update(team as Team, data)).toEqual(output);
   });
 
   it('should find one team by ID', async () => {
@@ -139,18 +138,18 @@ describe('TeamsService', () => {
         members: [],
       },
     ];
-    repository.find.mockReturnValue(output);
-    expect(await service.findAll()).toEqual(output);
+    repository.findAndCount.mockReturnValue([output, 2]);
+    const args: Partial<TeamsFindArgs> = { skip: 0, take: 25 };
+    expect(await service.findAll(args as TeamsFindArgs)).toEqual([output, 2]);
   });
 
   it('should add a user as a team member', async () => {
-    const input = {
+    const input: Partial<Team> = {
       id: 1,
       name: 'My Awesome Team',
       description: 'An awesome team',
-      owner: user,
+      owner: user as User,
       members: [],
-      ownedProjects: [],
       projects: [],
     };
     const output = {
@@ -163,7 +162,7 @@ describe('TeamsService', () => {
       projects: [],
     };
     repository.save.mockReturnValue(output);
-    const result = await service.addUser(input, user);
+    const result = await service.addUser(input as Team, user as User);
     expect(input.members).toEqual([user]);
     expect(result).toEqual(output);
   });
@@ -174,13 +173,12 @@ describe('TeamsService', () => {
       name: 'My Project',
       description: 'An awesome project',
     } as Project;
-    const input = {
+    const input: Partial<Team> = {
       id: 1,
       name: 'My Awesome Team',
       description: 'An awesome team',
-      owner: user,
+      owner: user as User,
       members: [],
-      ownedProjects: [],
       projects: [],
     };
     const output = {
@@ -193,7 +191,7 @@ describe('TeamsService', () => {
       projects: [project],
     };
     repository.save.mockReturnValue(output);
-    const result = await service.addProject(input, project);
+    const result = await service.addProject(input as Team, project);
     expect(input.projects).toEqual([project]);
     expect(result).toEqual(output);
   });

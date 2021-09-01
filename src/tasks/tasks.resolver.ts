@@ -21,7 +21,8 @@ import { ProjectsService } from '../projects/projects.service';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
 import { NewTaskInput } from './dto/new-task.input';
-import { TaskFindArgs } from './dto/task-find.args';
+import { TaskAddedInput } from './dto/task-added.input';
+import { TasksFindArgs } from './dto/tasks-find.args';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { Task } from './models/task.model';
 import { TasksResult } from './models/tasks-result.model';
@@ -76,7 +77,7 @@ export class TasksResolver {
 
   @Query((returns) => TasksResult)
   @UseGuards(GqlAuthGuard)
-  async tasks(@Args() args: TaskFindArgs) {
+  async tasks(@Args() args: TasksFindArgs) {
     const [result, total] = await this.tasksService.findAll(args);
     return {
       result,
@@ -147,15 +148,33 @@ export class TasksResolver {
     return await this.tasksService.addFollower(task, follower);
   }
 
-  @Subscription((returns) => Task)
+  @Subscription((returns) => Task, {
+    filter: (payload, variables) => {
+      if (variables.input && variables.input.projectId) {
+        return (
+          payload.taskAdded.projectId === Number(variables.input.projectId)
+        );
+      }
+      return true;
+    },
+  })
   @UseGuards(GqlAuthGuard)
-  taskAdded() {
+  taskAdded(@Args('input', { nullable: true }) input: TaskAddedInput) {
     return pubSub.asyncIterator('taskAdded');
   }
 
-  @Subscription((returns) => Task)
+  @Subscription((returns) => Task, {
+    filter: (payload, variables) => {
+      if (variables.input && variables.input.projectId) {
+        return (
+          payload.taskAdded.projectId === Number(variables.input.projectId)
+        );
+      }
+      return true;
+    },
+  })
   @UseGuards(GqlAuthGuard)
-  taskRemoved() {
+  taskRemoved(@Args('input', { nullable: true }) input: TaskAddedInput) {
     return pubSub.asyncIterator('taskRemoved');
   }
 }

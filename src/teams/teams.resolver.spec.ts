@@ -9,6 +9,7 @@ import { User as UserModel } from '../users/models/user.model';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewTeamInput } from './dto/new-team.input';
+import { TeamsFindArgs } from './dto/teams-find.args';
 import { UpdateTeamInput } from './dto/update-team.input';
 import { Team as TeamModel } from './models/team.model';
 import { Team } from './team.entity';
@@ -52,6 +53,7 @@ describe('TeamsResolver', () => {
       ownedTeams: [],
       tasks: [],
       myTasks: [],
+      assignments: [],
     } as UserModel;
 
     teamModel = {
@@ -63,8 +65,8 @@ describe('TeamsResolver', () => {
     } as TeamModel;
 
     teamsService = {
-      async findAll() {
-        return [team as Team];
+      async findAll(args, ...relations) {
+        return [[team as Team], 1];
       },
       async findOneById(id: number, ...relations: string[]): Promise<Team> {
         return team as Team;
@@ -148,8 +150,11 @@ describe('TeamsResolver', () => {
   });
 
   it('it should resolve all the teams', async () => {
-    user.teams = [team as Team];
-    expect(await resolver.teams()).toEqual([team]);
+    const args: Partial<TeamsFindArgs> = { skip: 0, take: 25 };
+    expect(await resolver.teams(args as TeamsFindArgs)).toEqual({
+      result: [team as Team],
+      total: 1,
+    });
   });
 
   it('should resolve all my teams', async () => {

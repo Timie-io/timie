@@ -9,7 +9,7 @@ describe('UsersResolver', () => {
   let resolver: UsersResolver;
   let usersService: Partial<UsersService>;
   let user: Partial<User>;
-  let currentUser: UserModel;
+  let currentUser: Partial<UserModel>;
 
   beforeEach(async () => {
     user = {
@@ -57,12 +57,12 @@ describe('UsersResolver', () => {
   });
 
   it('should return a user by ID', async () => {
-    expect(await resolver.user('1', currentUser)).toEqual(user);
+    expect(await resolver.user('1', currentUser as UserModel)).toEqual(user);
   });
 
   it('should throw unauthorized error when asking for a user and not me or not admin', async () => {
     try {
-      await resolver.user('2', currentUser);
+      await resolver.user('2', currentUser as UserModel);
     } catch (err) {
       expect(err).toBeInstanceOf(UnauthorizedException);
     }
@@ -70,7 +70,7 @@ describe('UsersResolver', () => {
 
   it('should not throw unauthorized error when asking for a user and Im admin', async () => {
     currentUser.isAdmin = true;
-    expect(await resolver.user('2', currentUser)).toEqual(user);
+    expect(await resolver.user('2', currentUser as UserModel)).toEqual(user);
   });
 
   it('should return my user data (me)', async () => {
@@ -81,7 +81,9 @@ describe('UsersResolver', () => {
       return returnedUser;
     };
 
-    expect(await resolver.loggedUser(currentUser)).toEqual(returnedUser);
+    expect(await resolver.loggedUser(currentUser as UserModel)).toEqual(
+      returnedUser,
+    );
   });
 
   it('should resolve all teams where I am a member', async () => {
@@ -92,7 +94,9 @@ describe('UsersResolver', () => {
     usersService.findOneById = async (id, ...relations) => {
       return returnedUser;
     };
-    expect(await resolver.teams(currentUser)).toEqual(returnedUser['teams']);
+    expect(await resolver.teams(currentUser as UserModel)).toEqual(
+      returnedUser['teams'],
+    );
   });
 
   it('should resolve all my owned teams', async () => {
@@ -103,7 +107,7 @@ describe('UsersResolver', () => {
     usersService.findOneById = async (id, ...relations) => {
       return returnedUser;
     };
-    expect(await resolver.ownedTeams(currentUser)).toEqual(
+    expect(await resolver.ownedTeams(currentUser as UserModel)).toEqual(
       returnedUser['ownedTeams'],
     );
   });

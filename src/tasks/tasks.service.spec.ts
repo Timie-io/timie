@@ -11,9 +11,9 @@ import { TasksService } from './tasks.service';
 describe('TasksService', () => {
   let service: TasksService;
   let repository: MockType<Repository<Task>>;
-  let user: User;
-  let project: Project;
-  let task: Task;
+  let user: Partial<User>;
+  let project: Partial<Project>;
+  let task: Partial<Task>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,7 +45,7 @@ describe('TasksService', () => {
       name: 'My Awesome Project',
       description: 'A super awesome project',
       creationDate: new Date(),
-      owner: user,
+      owner: user as User,
       team: undefined,
       tasks: [],
     };
@@ -54,11 +54,11 @@ describe('TasksService', () => {
       id: 1,
       title: 'This is a task',
       description: 'This is a task description',
-      project: project,
+      project: project as Project,
       creationDate: new Date(),
       priority: 1,
-      creator: user,
-      followers: [user],
+      creator: user as User,
+      followers: [user as User],
       active: true,
     };
 
@@ -73,7 +73,9 @@ describe('TasksService', () => {
   it('should create a task', async () => {
     repository.create.mockReturnValue(task);
     repository.save.mockReturnValue(task);
-    expect(await service.create(task, project, user)).toEqual(task);
+    expect(
+      await service.create(task, project as Project, user as User),
+    ).toEqual(task);
   });
 
   it('should find one task by ID', async () => {
@@ -98,14 +100,14 @@ describe('TasksService', () => {
   it('should update a task', async () => {
     const newTask = { ...task, description: 'Task Updated' };
     repository.save.mockReturnValue(newTask);
-    expect(await service.update(task, { description: 'Task Updated' })).toEqual(
-      newTask,
-    );
+    expect(
+      await service.update(task as Task, { description: 'Task Updated' }),
+    ).toEqual(newTask);
     expect(task).toEqual(newTask);
   });
 
   it('should remove a task', async () => {
     repository.remove.mockReturnValue(task);
-    expect(await service.remove(task)).toEqual(task);
+    expect(await service.remove(task as Task)).toEqual(task);
   });
 });

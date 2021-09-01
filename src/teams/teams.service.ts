@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
+import { TeamsFindArgs } from './dto/teams-find.args';
 import { Team } from './team.entity';
 
 @Injectable()
@@ -11,8 +12,23 @@ export class TeamsService {
     @InjectRepository(Team) private readonly repository: Repository<Team>,
   ) {}
 
-  async findAll(): Promise<Team[]> {
-    return this.repository.find();
+  async findAll(
+    args: TeamsFindArgs,
+    ...relations: string[]
+  ): Promise<[Team[], number]> {
+    const filter = {
+      where: {},
+      skip: args.skip,
+      take: args.take,
+      relations,
+    };
+    if (args.name) {
+      Object.assign(filter.where, { name: ILike(`%${args.name}%`) });
+    }
+    if (args.ownerId) {
+      Object.assign(filter.where, { ownerId: Number(args.ownerId) });
+    }
+    return await this.repository.findAndCount(filter);
   }
 
   async findOneById(

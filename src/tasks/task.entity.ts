@@ -4,8 +4,10 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Assignment } from '../assignments/assignment.entity';
 import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
 
@@ -41,4 +43,7 @@ export class Task {
 
   @Column()
   projectId: number;
+
+  @OneToMany(() => Assignment, (assignment) => assignment.task)
+  assignments: Assignment[];
 }

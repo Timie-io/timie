@@ -2,6 +2,23 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  creationDate: Date!
+  password: String!
+  isAdmin: Boolean!
+  ownedTeams: [Team!]
+  teams: [Team!]
+  tasks: [Task!]
+  myTasks: [Task!]
+  assignments: [Assignment!]
+}
+
+"""Date custom scalar type"""
+scalar Date
+
 type Team {
   id: ID!
   name: String!
@@ -20,14 +37,11 @@ type Project {
   team: Team
 }
 
-"""Date custom scalar type"""
-scalar Date
-
 type Task {
   id: ID!
   title: String!
   description: String!
-  priority: Float!
+  priority: Int!
   creationDate: Date!
   project: Project!
   active: Boolean!
@@ -35,17 +49,28 @@ type Task {
   followers: [User!]!
 }
 
-type User {
+type Assignment {
   id: ID!
-  name: String!
-  email: String!
+  creator: User!
   creationDate: Date!
-  password: String!
-  isAdmin: Boolean!
-  ownedTeams: [Team!]
-  teams: [Team!]
-  tasks: [Task!]
-  myTasks: [Task!]
+  user: User!
+  task: Task!
+  deadline: Date
+  title: String!
+  description: String!
+  status: Status!
+}
+
+type Status {
+  code: ID!
+  label: String!
+  order: Int!
+  assignments: [Assignment!]!
+}
+
+type TeamsResult {
+  result: [Team!]!
+  total: Int!
 }
 
 type ProjectsResult {
@@ -58,18 +83,26 @@ type TasksResult {
   total: Int!
 }
 
+type AssignmentsResult {
+  result: [Assignment!]!
+  total: Int!
+}
+
 type Query {
   user(id: ID!): User!
   loggedUser: User!
   team(id: ID!): Team!
-  teams: [Team!]
+  teams(skip: Int = 0, take: Int = 25, name: String, ownerId: ID): TeamsResult
   myTeams: [Team!]
   project(id: ID!): Project!
-  projects(skip: Int = 0, take: Int = 25): ProjectsResult!
+  projects(skip: Int = 0, take: Int = 25, name: String, ownerId: ID, teamId: ID): ProjectsResult!
   myProjects: [Project!]
-  projectsByName(skip: Int = 0, take: Int = 25, name: String!): ProjectsResult
   task(id: ID!): Task!
   tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean): TasksResult!
+  assignment(id: ID!): Assignment!
+  assignments(skip: Int = 0, take: Int = 25, userId: Int, taskId: Int, title: String): AssignmentsResult!
+  status(code: ID!): Status!
+  statuses: [Status!]!
 }
 
 type Mutation {
@@ -84,6 +117,12 @@ type Mutation {
   updateTask(data: UpdateTaskInput!, id: ID!): Task!
   removeTask(id: ID!): Task!
   addTaskFollower(userId: ID!, id: ID!): Task!
+  createAssignment(data: NewAssignmentInput!): Assignment!
+  updateAssignment(data: UpdateAssignmentInput!, id: ID!): Assignment!
+  removeAssignment(id: ID!): Assignment!
+  createStatus(data: NewStatusInput!): Status!
+  updateStatus(data: UpdateStatusInput!, code: ID!): Status!
+  removeStatus(code: ID!): Status!
 }
 
 input NewTeamInput {
@@ -109,7 +148,7 @@ input UpdateProjectInput {
 input NewTaskInput {
   title: String!
   description: String
-  priority: Float = 0
+  priority: Int = 0
   active: Boolean
   projectId: ID!
 }
@@ -117,11 +156,49 @@ input NewTaskInput {
 input UpdateTaskInput {
   title: String
   description: String
-  priority: Float
+  priority: Int = 0
   active: Boolean
 }
 
+input NewAssignmentInput {
+  taskId: ID!
+  title: String!
+  description: String!
+  deadline: Date
+  userId: ID
+  statusCode: ID
+}
+
+input UpdateAssignmentInput {
+  title: String
+  description: String
+  deadline: Date
+  userId: ID
+  statusCode: ID
+}
+
+input NewStatusInput {
+  code: String!
+  label: String!
+  order: Int!
+}
+
+input UpdateStatusInput {
+  label: String
+  order: Int
+}
+
 type Subscription {
-  taskAdded: Task!
-  taskRemoved: Task!
+  taskAdded(input: TaskAddedInput): Task!
+  taskRemoved(input: TaskAddedInput): Task!
+  assignmentAdded(input: AssignmentAddedInput): Assignment!
+  assignmentRemoved(input: AssignmentAddedInput): Assignment!
+}
+
+input TaskAddedInput {
+  projectId: ID
+}
+
+input AssignmentAddedInput {
+  taskId: ID
 }

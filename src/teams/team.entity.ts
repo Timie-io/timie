@@ -24,6 +24,9 @@ export class Team {
   @ManyToOne(() => User, (user) => user.ownedTeams)
   owner: User;
 
+  @Column()
+  ownerId: number;
+
   @ManyToMany(() => User, (user) => user.teams)
   @JoinTable()
   members: User[];

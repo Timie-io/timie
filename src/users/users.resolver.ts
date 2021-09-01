@@ -81,4 +81,9 @@ export class UsersResolver {
     );
     return myTasks;
   }
+
+  @ResolveField()
+  async assignments(@Parent() user: User) {
+    // TODO user assignments resolver
+  }
 }

@@ -171,14 +171,6 @@ describe('Teams E2E Tests', () => {
     expect(myProjects[0].owner.id).toEqual(userId);
   });
 
-  it('get team projects', async () => {
-    // TODO
-  });
-
-  it('get projects by name', async () => {
-    // TODO
-  });
-
   it('update project', async () => {
     const updateProjectMutation = gql`
       mutation updateProject($id: ID!, $data: UpdateProjectInput!) {

@@ -5,7 +5,7 @@ import { User as UserModel } from '../users/models/user.model';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewTaskInput } from './dto/new-task.input';
-import { TaskFindArgs } from './dto/task-find.args';
+import { TasksFindArgs } from './dto/tasks-find.args';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { Task } from './task.entity';
 import { TasksResolver } from './tasks.resolver';
@@ -125,19 +125,23 @@ describe('TasksResolver', () => {
   });
 
   it('should resolve a list of tasks', async () => {
-    const args: Partial<TaskFindArgs> = {
+    const args: Partial<TasksFindArgs> = {
       skip: 0,
       take: 25,
     };
-    expect(await resolver.tasks(args as TaskFindArgs)).toEqual({
+    expect(await resolver.tasks(args as TasksFindArgs)).toEqual({
       result: tasks,
       total: 2,
     });
   });
 
   it('should create a task', async () => {
+    const newTaskInput: Partial<NewTaskInput> = { ...task, projectId: '1' };
     expect(
-      await resolver.createTask(task as NewTaskInput, currentUser as UserModel),
+      await resolver.createTask(
+        newTaskInput as NewTaskInput,
+        currentUser as UserModel,
+      ),
     ).toEqual(task);
   });
 
@@ -162,6 +166,4 @@ describe('TasksResolver', () => {
     expect(updatedTask.followers.length).toEqual(2);
     expect(updatedTask.followers).toContain(follower);
   });
-
-  // TODO subscriptions?
 });

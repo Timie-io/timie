@@ -80,19 +80,22 @@ describe('Teams E2E Tests', () => {
     teamId = createTeam.id; // IMPORTANT
   });
 
-  it('list the teams where I am a member', async () => {
+  it('list all teams', async () => {
     const listTeamsQuery = gql`
-      {
-        teams {
-          id
-          name
-          description
-          owner {
-            email
+      query getAllTeams($ownerId: ID) {
+        teams(ownerId: $ownerId) {
+          result {
+            id
+            name
+            description
+            owner {
+              email
+            }
+            members {
+              email
+            }
           }
-          members {
-            email
-          }
+          total
         }
       }
     `;
@@ -100,22 +103,28 @@ describe('Teams E2E Tests', () => {
       .post('/graphql')
       .set('Authorization', `Bearer ${access_token}`)
       .send({
-        operationName: null,
+        operationName: 'getAllTeams',
         query: print(listTeamsQuery),
+        variables: {
+          ownerId: userId,
+        },
       });
     expect(res.body.data).toBeDefined();
     const {
       data: { teams },
     } = res.body;
-    expect(teams).toHaveLength(1);
-    expect(teams[0].id).toEqual(teamId);
-    expect(teams[0].name).toEqual(teamName);
-    expect(teams[0].description).toEqual(teamDesc);
-    expect(teams[0].owner.email).toEqual(email);
-    expect(teams[0].members[0].email).toEqual(email);
+    expect(teams).toBeDefined();
+    expect(teams.total).toBeDefined();
+    expect(teams.result).toHaveLength(1);
+    expect(teams.total).toEqual(1);
+    expect(teams.result[0].id).toEqual(teamId);
+    expect(teams.result[0].name).toEqual(teamName);
+    expect(teams.result[0].description).toEqual(teamDesc);
+    expect(teams.result[0].owner.email).toEqual(email);
+    expect(teams.result[0].members[0].email).toEqual(email);
   });
 
-  it('get a team owned by me by id', async () => {
+  it('get a team by id', async () => {
     const getTeamQuery = gql`
       query getTeam($id: ID!) {
         team(id: $id) {

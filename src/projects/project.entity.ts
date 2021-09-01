@@ -26,8 +26,14 @@ export class Project {
   @ManyToOne(() => User, (user) => user.projects)
   owner: User;
 
+  @Column()
+  ownerId: number;
+
   @ManyToOne(() => Team, (team) => team.projects, { nullable: true })
   team: Team;
+
+  @Column({ nullable: true })
+  teamId: number;
 
   @OneToMany(() => Task, (task) => task.project)
   tasks: Task[];

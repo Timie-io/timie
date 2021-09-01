@@ -5,15 +5,16 @@ import { MockType } from '../shared/mocks/mock.type';
 import { MockRepository } from '../shared/mocks/repository.mock';
 import { Team } from '../teams/team.entity';
 import { User } from '../users/user.entity';
+import { ProjectsFindArgs } from './dto/projects-find.args';
 import { Project } from './project.entity';
 import { ProjectsService } from './projects.service';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;
   let repository: MockType<Repository<Project>>;
-  let user: User;
-  let team: Team;
-  let project: Project;
+  let user: Partial<User>;
+  let team: Partial<Team>;
+  let project: Partial<Project>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,8 +45,8 @@ describe('ProjectsService', () => {
       id: 1,
       name: 'My Awesome Team',
       description: 'A super awesome team',
-      owner: user,
-      members: [user],
+      owner: user as User,
+      members: [user as User],
       projects: [],
     };
 
@@ -54,8 +55,8 @@ describe('ProjectsService', () => {
       name: 'My Awesome Project',
       description: 'A super awesome project',
       creationDate: new Date(),
-      owner: user,
-      team: team,
+      owner: user as User,
+      team: team as Team,
       tasks: [],
     };
 
@@ -74,8 +75,8 @@ describe('ProjectsService', () => {
     expect(
       await service.create(
         { name: project.name, description: project.description },
-        team,
-        user,
+        team as Team,
+        user as User,
       ),
     ).toEqual(project);
   });
@@ -91,16 +92,8 @@ describe('ProjectsService', () => {
       { ...project, id: 2, name: 'Team Awesome 2' },
     ];
     repository.findAndCount.mockReturnValue([result, 2]);
-    expect(await service.findAll(0, 25)).toEqual([result, 2]);
-  });
-
-  it('should find all by name', async () => {
-    const result = [
-      { ...project, id: 1, name: 'Team Awesome 1' },
-      { ...project, id: 2, name: 'Team Awesome 2' },
-    ];
-    repository.findAndCount.mockReturnValue([result, 2]);
-    expect(await service.findAllByName('Team Awesome', 0, 25)).toEqual([
+    const args: Partial<ProjectsFindArgs> = { skip: 0, take: 25 };
+    expect(await service.findAll(args as ProjectsFindArgs)).toEqual([
       result,
       2,
     ]);
@@ -109,7 +102,9 @@ describe('ProjectsService', () => {
   it('should be updated', async () => {
     const output = { ...project, name: 'Updated Name' };
     repository.save.mockReturnValue(output);
-    const result = await service.update(project, { name: 'Updated Name' });
+    const result = await service.update(project as Project, {
+      name: 'Updated Name',
+    });
     expect(result).toEqual(output);
     expect(project).toEqual(output);
   });
@@ -117,6 +112,6 @@ describe('ProjectsService', () => {
   it('should be removed', async () => {
     const output = { ...project, id: undefined };
     repository.remove.mockReturnValue(output);
-    expect(await service.remove(project)).toEqual(output);
+    expect(await service.remove(project as Project)).toEqual(output);
   });
 });

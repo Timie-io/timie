@@ -1,13 +1,5 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { Length, MaxLength } from 'class-validator';
+import { InputType, PartialType } from '@nestjs/graphql';
+import { NewProjectInput } from './new-project-input';
 
 @InputType()
-export class UpdateProjectInput {
-  @Field({ nullable: true })
-  @Length(1, 32)
-  name: string;
-
-  @Field({ nullable: true })
-  @MaxLength(256)
-  description: string;
-}
+export class UpdateProjectInput extends PartialType(NewProjectInput) {}

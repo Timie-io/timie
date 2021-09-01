@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
-import { TaskFindArgs } from './dto/task-find.args';
+import { TasksFindArgs } from './dto/tasks-find.args';
 import { Task } from './task.entity';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class TasksService {
   }
 
   async findAll(
-    args: TaskFindArgs,
+    args: TasksFindArgs,
     ...relations: string[]
   ): Promise<[Task[], number]> {
     const filter = {
@@ -31,13 +31,13 @@ export class TasksService {
       relations,
     };
     if (args.title) {
-      Object.assign(filter['where'], { title: ILike(`%${args.title}%`) });
+      Object.assign(filter.where, { title: ILike(`%${args.title}%`) });
     }
     if (args.active !== undefined) {
-      Object.assign(filter['where'], { active: args.active });
+      Object.assign(filter.where, { active: args.active });
     }
     if (args.projectId) {
-      Object.assign(filter['where'], { projectId: Number(args.projectId) });
+      Object.assign(filter.where, { projectId: Number(args.projectId) });
     }
     return await this.repository.findAndCount(filter);
   }
