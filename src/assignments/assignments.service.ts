@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Status } from '../status/status.entity';
+import { Task } from '../tasks/task.entity';
 import { User } from '../users/user.entity';
 import { Assignment } from './assignment.entity';
 import { AssignmentsFindArgs } from './dto/assignments-find.args';
@@ -28,10 +29,10 @@ export class AssignmentsService {
       relations,
     };
     if (args.userId) {
-      Object.assign(filter.where, { userId: args.userId });
+      Object.assign(filter.where, { userId: Number(args.userId) });
     }
     if (args.taskId) {
-      Object.assign(filter.where, { taskId: args.taskId });
+      Object.assign(filter.where, { taskId: Number(args.taskId) });
     }
     if (args.title) {
       Object.assign(filter.where, { title: ILike(`%${args.title}%`) });
@@ -41,11 +42,13 @@ export class AssignmentsService {
 
   async create(
     data: Partial<Assignment>,
+    task: Task,
     user: User,
     creator: User,
     status: Status,
   ): Promise<Assignment> {
     const assignment = this.repository.create(data);
+    assignment.task = task;
     assignment.user = user;
     assignment.creator = creator;
     assignment.status = status;
@@ -55,11 +58,15 @@ export class AssignmentsService {
   async update(
     assignment: Assignment,
     user: User,
+    status: Status,
     data: Partial<Assignment>,
   ): Promise<Assignment> {
     Object.assign(assignment, data);
     if (user) {
       assignment.user = user;
+    }
+    if (status) {
+      assignment.status = status;
     }
     return await this.repository.save(assignment);
   }

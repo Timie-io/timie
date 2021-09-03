@@ -100,7 +100,7 @@ type Query {
   task(id: ID!): Task!
   tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean): TasksResult!
   assignment(id: ID!): Assignment!
-  assignments(skip: Int = 0, take: Int = 25, userId: Int, taskId: Int, title: String): AssignmentsResult!
+  assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, title: String): AssignmentsResult!
   status(code: ID!): Status!
   statuses: [Status!]!
 }

@@ -72,7 +72,7 @@ export class AssignmentsResolver {
   async task(@Parent() assignment: Assignment) {
     const { task } = await this.assignmentsService.findOneById(
       Number(assignment.id),
-      'user',
+      'task',
     );
     return task;
   }
@@ -126,6 +126,7 @@ export class AssignmentsResolver {
     pubSub.publish('assignmentAdded', { assignmentAdded: assignment });
     return await this.assignmentsService.create(
       assignment,
+      task,
       user,
       creator,
       status,
@@ -142,12 +143,22 @@ export class AssignmentsResolver {
     if (!assignment) {
       throw new NotFoundException('assignment not found');
     }
-    const { userId, ...updateData } = data;
+    const { userId, statusCode, ...updateData } = data;
     let user: UserEntity;
+    let status: StatusEntity;
+
     if (userId) {
       user = await this.usersService.findOneById(Number(userId));
     }
-    return await this.assignmentsService.update(assignment, user, updateData);
+    if (statusCode) {
+      status = await this.statusService.findOneByCode(statusCode);
+    }
+    return await this.assignmentsService.update(
+      assignment,
+      user,
+      status,
+      updateData,
+    );
   }
 
   @Mutation((returns) => Assignment)

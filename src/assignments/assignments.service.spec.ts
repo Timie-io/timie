@@ -86,6 +86,7 @@ describe('AssignmentsService', () => {
     expect(
       await service.create(
         assignment,
+        task as Task,
         user as User,
         user as User,
         status as Status,
@@ -99,6 +100,7 @@ describe('AssignmentsService', () => {
     let updatedAssignment = await service.update(
       assignment as Assignment,
       undefined,
+      undefined,
       { title: newTitle },
     );
     expect(updatedAssignment.title).toEqual(newTitle);
@@ -107,9 +109,18 @@ describe('AssignmentsService', () => {
     updatedAssignment = await service.update(
       assignment as Assignment,
       newUser as User,
+      undefined,
       {},
     );
-    expect(updatedAssignment.user).toEqual(newUser);
+    const newStatus = { code: 'P', label: 'In Progress', order: 2 };
+    repository.save.mockReturnValue({ ...assignment, status: newStatus });
+    updatedAssignment = await service.update(
+      assignment as Assignment,
+      undefined,
+      newStatus as Status,
+      {},
+    );
+    expect(updatedAssignment.status).toEqual(newStatus);
   });
 
   it('should remove one', async () => {
