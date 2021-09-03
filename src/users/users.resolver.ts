@@ -84,6 +84,10 @@ export class UsersResolver {
 
   @ResolveField()
   async assignments(@Parent() user: User) {
-    // TODO user assignments resolver
+    const { assignments } = await this.usersService.findOneById(
+      Number(user.id),
+      'assignments',
+    );
+    return assignments;
   }
 }
