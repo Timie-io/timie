@@ -10,6 +10,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
 import { StatusModule } from './status/status.module';
+import { EntriesModule } from './entries/entries.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { StatusModule } from './status/status.module';
     TasksModule,
     AssignmentsModule,
     StatusModule,
+    EntriesModule,
   ],
   providers: [ComplexityPlugin],
 })

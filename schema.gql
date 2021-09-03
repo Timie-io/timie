@@ -88,6 +88,18 @@ type AssignmentsResult {
   total: Int!
 }
 
+type Entry {
+  id: ID!
+  startTime: Date
+  finishTime: Date
+  assignment: Assignment!
+}
+
+type EntriesResult {
+  result: [Entry!]!
+  total: Int!
+}
+
 type Query {
   user(id: ID!): User!
   loggedUser: User!
@@ -103,6 +115,8 @@ type Query {
   assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, title: String): AssignmentsResult!
   status(code: ID!): Status!
   statuses: [Status!]!
+  entry(id: ID!): ID!
+  entries(skip: Int = 0, take: Int = 25, assignmentId: ID): EntriesResult!
 }
 
 type Mutation {
@@ -123,6 +137,11 @@ type Mutation {
   createStatus(data: NewStatusInput!): Status!
   updateStatus(data: UpdateStatusInput!, code: ID!): Status!
   removeStatus(code: ID!): Status!
+  createEntry(data: NewEntryInput!): Entry!
+  updateEntry(data: UpdateEntryInput!, id: ID!): Entry!
+  removeEntry(id: ID!): Entry!
+  startEntry(id: ID!): Entry!
+  stopEntry(id: ID!): Entry!
 }
 
 input NewTeamInput {
@@ -188,11 +207,24 @@ input UpdateStatusInput {
   order: Int
 }
 
+input NewEntryInput {
+  startTime: Date
+  finishTime: Date
+  assignmentId: ID!
+}
+
+input UpdateEntryInput {
+  startTime: Date
+  finishTime: Date
+}
+
 type Subscription {
   taskAdded(input: TaskAddedInput): Task!
   taskRemoved(input: TaskAddedInput): Task!
   assignmentAdded(input: AssignmentAddedInput): Assignment!
   assignmentRemoved(input: AssignmentAddedInput): Assignment!
+  entryStarted(input: EntryChangedInput): Entry!
+  entryStopped(input: EntryChangedInput): Entry!
 }
 
 input TaskAddedInput {
@@ -201,4 +233,8 @@ input TaskAddedInput {
 
 input AssignmentAddedInput {
   taskId: ID
+}
+
+input EntryChangedInput {
+  assignmentId: ID
 }

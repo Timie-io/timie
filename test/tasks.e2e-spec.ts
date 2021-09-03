@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 
-describe('Teams E2E Tests', () => {
+describe('Tasks E2E Tests', () => {
   let app: INestApplication;
   let access_token: string;
   const email = faker.internet.email();

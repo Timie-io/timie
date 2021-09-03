@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Entry } from '../entries/entry.entity';
 import { Status } from '../status/status.entity';
 import { Task } from '../tasks/task.entity';
 import { User } from '../users/user.entity';
@@ -43,4 +50,7 @@ export class Assignment {
 
   @Column({ nullable: true })
   statusCode: string;
+
+  @OneToMany(() => Entry, (entry) => entry.assignment)
+  entries: Entry[];
 }

@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 
-describe('Assignments E2E Tests', () => {
+describe('Entries E2E Tests', () => {
   let app: INestApplication;
   let access_token: string;
   const email = faker.internet.email();
@@ -18,6 +18,7 @@ describe('Assignments E2E Tests', () => {
   let taskId: string;
   let statusCode = 'O';
   let assignmentId: string;
+  let entryId: string;
 
   const projectName = faker.name.title();
   const projectDesc = 'This is my Awesome project';
@@ -25,7 +26,7 @@ describe('Assignments E2E Tests', () => {
   const taskTitle = 'Amazing Task'; // could be duplicated
   const taskDesc = 'This is an amazing task';
 
-  let assignmentTitle = 'Assignment'; // could be duplicated
+  const assignmentTitle = 'Assignment'; // could be duplicated
   const assignmentDesc = 'This is an assignment';
 
   beforeEach(async () => {
@@ -143,17 +144,6 @@ describe('Assignments E2E Tests', () => {
       mutation createAssignment($data: NewAssignmentInput!) {
         createAssignment(data: $data) {
           id
-          title
-          description
-          status {
-            code
-          }
-          task {
-            id
-          }
-          user {
-            id
-          }
         }
       }
     `;
@@ -179,54 +169,22 @@ describe('Assignments E2E Tests', () => {
       data: { createAssignment },
     } = res.body;
     expect(createAssignment).toBeDefined();
-    expect(createAssignment.title).toEqual(assignmentTitle);
-    expect(createAssignment.description).toEqual(assignmentDesc);
-    expect(createAssignment.status).toBeDefined();
-    expect(createAssignment.status.code).toEqual(statusCode);
-    expect(createAssignment.task).toBeDefined();
-    expect(createAssignment.task.id).toEqual(taskId);
-    expect(createAssignment.user).toBeDefined();
-    expect(createAssignment.user.id).toEqual(userId);
 
     assignmentId = createAssignment.id; // IMPORTANT
   });
 
-  it('get an assignment by ID', async () => {
-    const getAssignmentQuery = gql`
-      query getAssignment($id: ID!) {
-        assignment(id: $id) {
-          title
-          description
-        }
-      }
-    `;
-    const res = await request(app.getHttpServer())
-      .post('/graphql')
-      .set('Authorization', `Bearer ${access_token}`)
-      .send({
-        operationName: 'getAssignment',
-        query: print(getAssignmentQuery),
-        variables: {
-          id: assignmentId,
-        },
-      });
-    expect(res.body.data).toBeDefined();
-    const {
-      data: { assignment },
-    } = res.body;
-    expect(assignment).toBeDefined();
-    expect(assignment.title).toEqual(assignmentTitle);
-    expect(assignment.description).toEqual(assignmentDesc);
-  });
-
-  it('get all assignments', async () => {
-    const getAllAssignmentsQuery = gql`
-      query getAllAssignments($taskId: ID!) {
-        assignments(taskId: $taskId) {
-          result {
+  it('create an entry', async () => {
+    const createEntryMutation = gql`
+      mutation createEntry($data: NewEntryInput!) {
+        createEntry(data: $data) {
+          id
+          startTime
+          finishTime
+          assignment {
             id
+            title
+            description
           }
-          total
         }
       }
     `;
@@ -234,60 +192,35 @@ describe('Assignments E2E Tests', () => {
       .post('/graphql')
       .set('Authorization', `Bearer ${access_token}`)
       .send({
-        operationName: 'getAllAssignments',
-        query: print(getAllAssignmentsQuery),
+        operationName: 'createEntry',
+        query: print(createEntryMutation),
         variables: {
-          taskId: taskId,
-        },
-      });
-    expect(res.body.data).toBeDefined();
-    const {
-      data: { assignments },
-    } = res.body;
-    expect(assignments).toBeDefined();
-    expect(assignments.total).toEqual(1);
-    expect(assignments.result).toHaveLength(1);
-    expect(assignments.result[0].id).toEqual(assignmentId);
-  });
-
-  it('update an assignment', async () => {
-    const updateAssignmentMutation = gql`
-      mutation updateAssignment($id: ID!, $data: UpdateAssignmentInput!) {
-        updateAssignment(id: $id, data: $data) {
-          title
-        }
-      }
-    `;
-    const newTitle = 'This Title has been updated';
-    const res = await request(app.getHttpServer())
-      .post('/graphql')
-      .set('Authorization', `Bearer ${access_token}`)
-      .send({
-        operationName: 'updateAssignment',
-        query: print(updateAssignmentMutation),
-        variables: {
-          id: assignmentId,
           data: {
-            title: newTitle,
+            assignmentId: assignmentId,
           },
         },
       });
     expect(res.body.data).toBeDefined();
     const {
-      data: { updateAssignment },
+      data: { createEntry },
     } = res.body;
-    expect(updateAssignment).toBeDefined();
-    expect(updateAssignment.title).toEqual(newTitle);
+    expect(createEntry).toBeDefined();
+    expect(createEntry.startTime).toBeNull();
+    expect(createEntry.finishTime).toBeNull();
+    expect(createEntry.assignment).toBeDefined();
+    expect(createEntry.assignment.id).toEqual(assignmentId);
+    expect(createEntry.assignment.title).toEqual(assignmentTitle);
+    expect(createEntry.assignment.description).toEqual(assignmentDesc);
 
-    assignmentTitle = newTitle;
+    entryId = createEntry.id;
   });
 
-  it('remove an assignment', async () => {
-    const removeAssignmentMutation = gql`
-      mutation removeAssignment($id: ID!) {
-        removeAssignment(id: $id) {
-          title
-          description
+  it('start the timer for a entry', async () => {
+    const startEntryMutation = gql`
+      mutation startEntry($id: ID!) {
+        startEntry(id: $id) {
+          startTime
+          finishTime
         }
       }
     `;
@@ -295,18 +228,108 @@ describe('Assignments E2E Tests', () => {
       .post('/graphql')
       .set('Authorization', `Bearer ${access_token}`)
       .send({
-        operationName: 'removeAssignment',
-        query: print(removeAssignmentMutation),
+        operationName: 'startEntry',
+        query: print(startEntryMutation),
         variables: {
-          id: assignmentId,
+          id: entryId,
         },
       });
     expect(res.body.data).toBeDefined();
     const {
-      data: { removeAssignment },
+      data: { startEntry },
     } = res.body;
-    expect(removeAssignment).toBeDefined();
-    expect(removeAssignment.title).toEqual(assignmentTitle);
-    expect(removeAssignment.description).toEqual(assignmentDesc);
+    expect(startEntry).toBeDefined();
+    expect(startEntry.startTime).toBeDefined();
+    expect(startEntry.startTime).not.toBeNull();
+    expect(startEntry.finishTime).toBeDefined();
+    expect(startEntry.finishTime).toBeNull();
+  });
+
+  it('stop the timer for a entry', async () => {
+    const stopEntryMutation = gql`
+      mutation stopEntry($id: ID!) {
+        stopEntry(id: $id) {
+          startTime
+          finishTime
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send({
+        operationName: 'stopEntry',
+        query: print(stopEntryMutation),
+        variables: {
+          id: entryId,
+        },
+      });
+    expect(res.body.data).toBeDefined();
+    const {
+      data: { stopEntry },
+    } = res.body;
+    expect(stopEntry).toBeDefined();
+    expect(stopEntry.startTime).toBeDefined();
+    expect(stopEntry.startTime).not.toBeNull();
+    expect(stopEntry.finishTime).toBeDefined();
+    expect(stopEntry.finishTime).not.toBeNull();
+  });
+
+  it('update an entry', async () => {
+    const updateEntryMutation = gql`
+      mutation updateEntry($id: ID!, $data: UpdateEntryInput!) {
+        updateEntry(id: $id, data: $data) {
+          startTime
+          finishTime
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send({
+        operationName: 'updateEntry',
+        query: print(updateEntryMutation),
+        variables: {
+          id: entryId,
+          data: {
+            startTime: new Date(),
+            finishTime: null,
+          },
+        },
+      });
+    expect(res.body.data).toBeDefined();
+    const {
+      data: { updateEntry },
+    } = res.body;
+    expect(updateEntry).toBeDefined();
+    expect(updateEntry.startTime).not.toBeNull();
+    expect(updateEntry.finishTime).toBeNull();
+  });
+
+  it('remove an entry', async () => {
+    const removeEntryMutation = gql`
+      mutation removeEntry($id: ID!) {
+        removeEntry(id: $id) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send({
+        operationName: 'removeEntry',
+        query: print(removeEntryMutation),
+        variables: {
+          id: entryId,
+        },
+      });
+    expect(res.body.data).toBeDefined();
+    const {
+      data: { removeEntry },
+    } = res.body;
+    expect(removeEntry).toBeDefined();
+    expect(removeEntry.id).toEqual(entryId);
   });
 });

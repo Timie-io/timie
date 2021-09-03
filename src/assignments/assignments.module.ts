@@ -15,5 +15,6 @@ import { AssignmentsService } from './assignments.service';
     StatusModule,
   ],
   providers: [AssignmentsService, AssignmentsResolver],
+  exports: [AssignmentsService],
 })
 export class AssignmentsModule {}
