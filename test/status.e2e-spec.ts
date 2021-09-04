@@ -13,9 +13,9 @@ describe('Status E2E Tests', () => {
   const password = '1234';
   const name = faker.name.findName();
 
-  const statusCode = 'O';
-  let statusLabel = 'Open';
-  const statusOrder = 1;
+  const statusCode = 'P';
+  let statusLabel = 'In Progress';
+  const statusOrder = 2;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -116,10 +116,7 @@ describe('Status E2E Tests', () => {
       data: { statuses },
     } = res.body;
     expect(statuses).toBeDefined();
-    expect(statuses).toHaveLength(1);
-    expect(statuses[0].code).toEqual(statusCode);
-    expect(statuses[0].label).toEqual(statusLabel);
-    expect(statuses[0].order).toEqual(statusOrder);
+    expect(statuses.length).toBeGreaterThan(0);
   });
 
   it('update status', async () => {

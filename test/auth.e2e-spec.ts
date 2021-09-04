@@ -10,6 +10,10 @@ describe('Authentication System', () => {
   const password = '1234';
   const name = faker.name.findName();
 
+  let access_token: string;
+  let refresh_token: string;
+  let old_access_token: string;
+
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -24,6 +28,7 @@ describe('Authentication System', () => {
       .send({ email, password, name })
       .expect(201);
     expect(res.body.access_token).toBeDefined();
+    expect(res.body.refresh_token).toBeDefined();
   });
 
   it('handle a signin request', async () => {
@@ -33,12 +38,51 @@ describe('Authentication System', () => {
       .expect(201);
 
     expect(res.body.access_token).toBeDefined();
+    expect(res.body.refresh_token).toBeDefined();
+
+    access_token = res.body.access_token;
+    refresh_token = res.body.refresh_token;
   });
 
   it('should respond 401 unauthorized', async () => {
     const res = await request(app.getHttpServer())
       .post('/auth/signin')
       .send({ username: email, password: 'wrong password' })
+      .expect(401);
+  });
+
+  it('should refresh token', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/refresh')
+      .set('Authorization', `Bearer ${refresh_token}`)
+      .expect(201);
+
+    expect(res.body.access_token).toBeDefined();
+    expect(res.body.refresh_token).toBeDefined();
+
+    old_access_token = access_token;
+    access_token = res.body.access_token;
+    refresh_token = res.body.refresh_token;
+  });
+
+  it('the old access token should not work', async () => {
+    await request(app.getHttpServer())
+      .get('/auth/logout')
+      .set('Authorization', `Bearer ${old_access_token}`)
+      .expect(401);
+  });
+
+  it('should logout', async () => {
+    await request(app.getHttpServer())
+      .get('/auth/logout')
+      .set('Authorization', `Bearer ${access_token}`)
+      .expect(200);
+  });
+
+  it('should be logged out', async () => {
+    await request(app.getHttpServer())
+      .get('/auth/logout')
+      .set('Authorization', `Bearer ${access_token}`)
       .expect(401);
   });
 });

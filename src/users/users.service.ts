@@ -32,11 +32,7 @@ export class UsersService {
     return await this.repository.find(args);
   }
 
-  async update(id: number, data: Partial<User>): Promise<User> {
-    let user = await this.repository.findOne(id);
-    if (!user) {
-      throw new NotFoundException('team not found');
-    }
+  async update(user: User, data: Partial<User>): Promise<User> {
     Object.assign(user, data);
     return await this.repository.save(user);
   }

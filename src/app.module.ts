@@ -1,3 +1,4 @@
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -5,12 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
 import { ComplexityPlugin } from './common/plugins/complexity.plugin';
+import { EntriesModule } from './entries/entries.module';
 import { ProjectsModule } from './projects/projects.module';
+import { StatusModule } from './status/status.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
-import { StatusModule } from './status/status.module';
-import { EntriesModule } from './entries/entries.module';
 
 @Module({
   imports: [
@@ -54,6 +55,16 @@ import { EntriesModule } from './entries/entries.module';
             migrationsDir: 'migration',
           },
           keepConnectionAlive: true,
+        };
+      },
+    }),
+    RedisModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          config: {
+            url: config.get<string>('REDIS_URL'),
+          },
         };
       },
     }),

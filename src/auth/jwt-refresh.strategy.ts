@@ -6,7 +6,10 @@ import { Redis } from 'ioredis';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     private readonly config: ConfigService,
     @InjectRedis() private readonly redis: Redis,
@@ -14,13 +17,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: config.get<string>('JWT_SECRET'),
+      secretOrKey: config.get<string>('JWT_REFRESH_SECRET'),
     });
   }
 
   async validate(payload: any) {
     const loggedTime = await this.redis.get(`login_${payload.sub}`);
-    if (!loggedTime || loggedTime !== payload.time) {
+    if (!loggedTime) {
       return null;
     }
     return {

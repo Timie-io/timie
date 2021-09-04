@@ -4,11 +4,16 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SignUpUser } from './dto/sign-up.user';
 
+interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
 describe('AuthController', () => {
   let controller: AuthController;
   let authService: Partial<AuthService>;
   let user: Partial<User>;
-  let tokenResponse: { access_token: string };
+  let tokenResponse: TokenResponse;
 
   beforeEach(async () => {
     user = {
@@ -21,9 +26,10 @@ describe('AuthController', () => {
     };
     tokenResponse = {
       access_token: 'thisistheaccesstoken',
+      refresh_token: 'thisistherefreshtoken',
     };
     authService = {
-      login: async (user: User): Promise<{ access_token: string }> => {
+      login: async (user: User): Promise<TokenResponse> => {
         return tokenResponse;
       },
       signUp: async (body: SignUpUser): Promise<User> => {

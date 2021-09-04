@@ -1,6 +1,9 @@
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
+import { Redis } from 'ioredis';
 import { promisify } from 'util';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
@@ -13,6 +16,8 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
+    @InjectRedis() private readonly redis: Redis,
   ) {}
 
   static async generateSaltedHashedPassword(password: string): Promise<string> {
@@ -58,9 +63,29 @@ export class AuthService {
   }
 
   async login(user: User) {
-    const payload = { email: user.email, sub: user.id, admin: user.isAdmin };
-    return {
-      access_token: this.jwtService.sign(payload),
+    const loggedTime = new Date().toISOString();
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      admin: user.isAdmin,
+      time: loggedTime,
     };
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.config.get<string>('JWT_SECRET'),
+      expiresIn: this.config.get<string>('JWT_EXPIRES_IN'),
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.config.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: this.config.get<string>('JWT_REFRESH_EXPIRES_IN'),
+    });
+    await this.redis.set(`login_${user.id}`, loggedTime);
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
+  async logout(user: User) {
+    return await this.redis.del(`login_${user.id}`);
   }
 }

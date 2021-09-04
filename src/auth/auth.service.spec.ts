@@ -1,15 +1,20 @@
+import { DEFAULT_REDIS_CLIENT } from '@liaoliaots/nestjs-redis';
 import { BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NewUserInput } from 'src/users/dto/new-user.input';
+import { MockRedis } from '../shared/mocks/redis.mock';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let configService: Partial<ConfigService>;
   let usersService: Partial<UsersService>;
   let jwtService: Partial<JwtService>;
+
   let user: Partial<User>;
   let password: string;
 
@@ -22,6 +27,11 @@ describe('AuthService', () => {
       password: await AuthService.generateSaltedHashedPassword(password),
       creationDate: new Date(),
       isAdmin: false,
+    };
+    configService = {
+      get(key) {
+        return 'something';
+      },
     };
     usersService = {
       findOneById: async (id: number): Promise<User> => {
@@ -47,8 +57,10 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
+        { provide: ConfigService, useValue: configService },
         { provide: UsersService, useValue: usersService },
         { provide: JwtService, useValue: jwtService },
+        { provide: DEFAULT_REDIS_CLIENT, useClass: MockRedis },
       ],
     }).compile();
 
@@ -111,6 +123,9 @@ describe('AuthService', () => {
 
   it('should login a user signing the email and the ID in a JWT', async () => {
     const result = await service.login(user as User);
-    expect(result).toEqual({ access_token: jwtService.sign({}) });
+    expect(result).toEqual({
+      access_token: jwtService.sign({}),
+      refresh_token: jwtService.sign({}),
+    });
   });
 });
