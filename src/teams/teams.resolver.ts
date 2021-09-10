@@ -12,17 +12,22 @@ import {
   Query,
   ResolveField,
   Resolver,
+  Subscription,
 } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
 import { NewTeamInput } from './dto/new-team.input';
+import { TeamAddedInput } from './dto/team-added.input';
 import { TeamsFindArgs } from './dto/teams-find.args';
 import { UpdateTeamInput } from './dto/update-team.input';
 import { Team } from './models/team.model';
 import { TeamsResult } from './models/teams-result.model';
 import { TeamsService } from './teams.service';
+
+const pubSub = new PubSub();
 
 @Resolver((of) => Team)
 export class TeamsResolver {
@@ -100,12 +105,14 @@ export class TeamsResolver {
     @Args('data') data: NewTeamInput,
     @CurrentUser() user: User,
   ) {
-    const team = await this.teamsService.findOneByName(data.name);
-    if (team) {
+    const oldTeam = await this.teamsService.findOneByName(data.name);
+    if (oldTeam) {
       throw new BadRequestException('team with same name already exists');
     }
     const owner = await this.usersService.findOneById(Number(user.id));
-    return await this.teamsService.create(data, owner);
+    const team = await this.teamsService.create(data, owner);
+    pubSub.publish('teamAdded', { teamAdded: team });
+    return team;
   }
 
   @Mutation((returns) => Team)
@@ -123,6 +130,7 @@ export class TeamsResolver {
     }
     const copy = { ...team };
     await this.teamsService.remove(team);
+    pubSub.publish('teamRemoved', { teamRemoved: copy });
     return copy;
   }
 
@@ -166,5 +174,37 @@ export class TeamsResolver {
       throw new BadRequestException('user does not exist');
     }
     return this.teamsService.addUser(team, member);
+  }
+
+  @Subscription((returns) => Team, {
+    filter: (payload, variables) => {
+      if (variables.input && variables.input.ownerId) {
+        return payload.teamAdded.ownerId === Number(variables.input.ownerId);
+      }
+      return true;
+    },
+  })
+  @UseGuards(GqlAuthGuard)
+  teamAdded(
+    @Args('input', { type: () => TeamAddedInput, nullable: true })
+    input: TeamAddedInput,
+  ) {
+    return pubSub.asyncIterator('teamAdded');
+  }
+
+  @Subscription((returns) => Team, {
+    filter: (payload, variables) => {
+      if (variables.input && variables.input.ownerId) {
+        return payload.teamAdded.ownerId === Number(variables.input.ownerId);
+      }
+      return true;
+    },
+  })
+  @UseGuards(GqlAuthGuard)
+  teamRemoved(
+    @Args('input', { type: () => TeamAddedInput, nullable: true })
+    input: TeamAddedInput,
+  ) {
+    return pubSub.asyncIterator('teamRemoved');
   }
 }

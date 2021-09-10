@@ -11,7 +11,9 @@ import {
   Query,
   ResolveField,
   Resolver,
+  Subscription,
 } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { Team } from '../teams/team.entity';
@@ -19,11 +21,14 @@ import { TeamsService } from '../teams/teams.service';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
 import { NewProjectInput } from './dto/new-project-input';
+import { ProjectAddedInput } from './dto/project-added.input';
 import { ProjectsFindArgs } from './dto/projects-find.args';
 import { UpdateProjectInput } from './dto/update-project.input';
 import { Project } from './models/project.model';
 import { ProjectsResult } from './models/projects-result.model';
 import { ProjectsService } from './projects.service';
+
+const pubSub = new PubSub();
 
 @Resolver((of) => Project)
 export class ProjectsResolver {
@@ -96,7 +101,9 @@ export class ProjectsResolver {
       }
     }
     const owner = await this.usersService.findOneById(Number(user.id));
-    return await this.projectsService.create(data, team, owner);
+    const project = await this.projectsService.create(data, team, owner);
+    pubSub.publish('projectAdded', { projectAdded: project });
+    return project;
   }
 
   @Mutation((returns) => Project)
@@ -131,6 +138,53 @@ export class ProjectsResolver {
     }
     const copy = { ...project };
     await this.projectsService.remove(project);
+    pubSub.publish('projectRemoved', { projectRemoved: copy });
     return copy;
+  }
+
+  @Subscription((returns) => Project, {
+    filter: (payload, variables) => {
+      if (variables.input && variables.input.ownerId) {
+        if (payload.teamAdded.ownerId !== Number(variables.input.ownerId)) {
+          return false;
+        }
+      }
+      if (variables.input && variables.input.teamId) {
+        if (payload.teamAdded.teamId !== Number(variables.input.teamId)) {
+          return false;
+        }
+      }
+      return true;
+    },
+  })
+  @UseGuards(GqlAuthGuard)
+  projectAdded(
+    @Args('input', { type: () => ProjectAddedInput, nullable: true })
+    input: ProjectAddedInput,
+  ) {
+    return pubSub.asyncIterator('projectAdded');
+  }
+
+  @Subscription((returns) => Project, {
+    filter: (payload, variables) => {
+      if (variables.input && variables.input.ownerId) {
+        if (payload.teamAdded.ownerId !== Number(variables.input.ownerId)) {
+          return false;
+        }
+      }
+      if (variables.input && variables.input.teamId) {
+        if (payload.teamAdded.teamId !== Number(variables.input.teamId)) {
+          return false;
+        }
+      }
+      return true;
+    },
+  })
+  @UseGuards(GqlAuthGuard)
+  projectRemoved(
+    @Args('input', { type: () => ProjectAddedInput, nullable: true })
+    input: ProjectAddedInput,
+  ) {
+    return pubSub.asyncIterator('projectRemoved');
   }
 }

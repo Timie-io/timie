@@ -219,12 +219,25 @@ input UpdateEntryInput {
 }
 
 type Subscription {
+  teamAdded(input: TeamAddedInput): Team!
+  teamRemoved(input: TeamAddedInput): Team!
+  projectAdded(input: ProjectAddedInput): Project!
+  projectRemoved(input: ProjectAddedInput): Project!
   taskAdded(input: TaskAddedInput): Task!
   taskRemoved(input: TaskAddedInput): Task!
   assignmentAdded(input: AssignmentAddedInput): Assignment!
   assignmentRemoved(input: AssignmentAddedInput): Assignment!
   entryStarted(input: EntryChangedInput): Entry!
   entryStopped(input: EntryChangedInput): Entry!
+}
+
+input TeamAddedInput {
+  ownerId: ID
+}
+
+input ProjectAddedInput {
+  ownerId: ID
+  teamId: ID
 }
 
 input TaskAddedInput {
