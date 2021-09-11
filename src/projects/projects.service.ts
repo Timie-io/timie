@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { FindManyOptions, ILike, Repository } from 'typeorm';
 import { Team } from '../teams/team.entity';
 import { User } from '../users/user.entity';
 import { ProjectsFindArgs } from './dto/projects-find.args';
@@ -28,8 +28,11 @@ export class ProjectsService {
       where: {},
       skip: args.skip,
       take: args.take,
+      order: {
+        id: 'DESC',
+      },
       relations,
-    };
+    } as FindManyOptions;
     if (args.name) {
       Object.assign(filter.where, { name: ILike(`%${args.name}%`) });
     }
