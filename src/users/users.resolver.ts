@@ -13,6 +13,7 @@ import {
 } from '@nestjs/graphql';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
+import { UserOutput } from './models/user-output.model';
 import { User } from './models/user.model';
 import { UsersService } from './users.service';
 
@@ -34,6 +35,12 @@ export class UsersResolver {
       throw new NotFoundException('user not found');
     }
     return result;
+  }
+
+  @Query((returns) => [UserOutput])
+  @UseGuards(GqlAuthGuard)
+  async users() {
+    return this.usersService.findAll();
   }
 
   @Query((returns) => User)
