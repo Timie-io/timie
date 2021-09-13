@@ -124,6 +124,7 @@ type Mutation {
   removeTeam(id: ID!): Team!
   updateTeam(data: UpdateTeamInput!, id: ID!): Team!
   addTeamMember(userId: ID!, teamId: ID!): Team!
+  removeTeamMember(userId: ID!, teamId: ID!): Team!
   createProject(teamId: ID, data: NewProjectInput!): Project!
   updateProject(data: UpdateProjectInput!, id: ID!): Project!
   removeProject(id: ID!): Project!

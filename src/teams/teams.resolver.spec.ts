@@ -83,7 +83,10 @@ describe('TeamsResolver', () => {
       async remove(team: Team): Promise<Team> {
         return team as Team;
       },
-      async addUser(team: Team, user: User): Promise<Team> {
+      async addMember(team: Team, user: User): Promise<Team> {
+        return team as Team;
+      },
+      async removeMember(team: Team, user: User): Promise<Team> {
         return team as Team;
       },
     };
@@ -236,6 +239,12 @@ describe('TeamsResolver', () => {
     expect(await resolver.addTeamMember(teamModel.id, '2', userModel)).toEqual(
       team,
     );
+  });
+
+  it('should remove a team member', async () => {
+    expect(
+      await resolver.removeTeamMember(teamModel.id, '2', userModel),
+    ).toEqual(team);
   });
 
   it('should throw a not found exception when trying adding a new member on an unexisting team', async () => {

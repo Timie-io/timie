@@ -173,7 +173,32 @@ export class TeamsResolver {
     if (!member) {
       throw new BadRequestException('user does not exist');
     }
-    return this.teamsService.addUser(team, member);
+    return this.teamsService.addMember(team, member);
+  }
+
+  @Mutation((returns) => Team)
+  @UseGuards(GqlAuthGuard)
+  async removeTeamMember(
+    @Args('teamId', { type: () => ID }) teamId: string,
+    @Args('userId', { type: () => ID }) userId: string,
+    @CurrentUser() user: User,
+  ) {
+    const team = await this.teamsService.findOneById(
+      parseInt(teamId),
+      'owner',
+      'members',
+    );
+    if (!team) {
+      throw new NotFoundException('team does not exist');
+    }
+    if (team.owner.id !== Number(user.id)) {
+      throw new UnauthorizedException('action not allowed');
+    }
+    const member = await this.usersService.findOneById(parseInt(userId));
+    if (!member) {
+      throw new BadRequestException('user does not exist');
+    }
+    return this.teamsService.removeMember(team, member);
   }
 
   @Subscription((returns) => Team, {

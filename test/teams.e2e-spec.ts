@@ -239,6 +239,47 @@ describe('Teams E2E Tests', () => {
     expect(addTeamMember).toBeDefined();
     expect(addTeamMember.id).toEqual(teamId);
     expect(addTeamMember.name).toEqual(teamName);
+    expect(addTeamMember.members).toHaveLength(1);
+    expect(addTeamMember.members[0].id).toEqual(userId);
+  });
+
+  it('remove a team member', async () => {
+    const removeTeamMemberMutation = gql`
+      mutation removeTeamMember($userId: ID!, $teamId: ID!) {
+        removeTeamMember(userId: $userId, teamId: $teamId) {
+          id
+          name
+          description
+          owner {
+            id
+            email
+          }
+          members {
+            id
+            email
+          }
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send({
+        operationName: 'removeTeamMember',
+        query: print(removeTeamMemberMutation),
+        variables: {
+          userId: userId, // actualy, this user is already a member... :)
+          teamId: teamId,
+        },
+      });
+    expect(res.body.data).toBeDefined();
+    const {
+      data: { removeTeamMember },
+    } = res.body;
+    expect(removeTeamMember).toBeDefined();
+    expect(removeTeamMember.id).toEqual(teamId);
+    expect(removeTeamMember.name).toEqual(teamName);
+    expect(removeTeamMember.members).toHaveLength(0);
   });
 
   it('remove a team owned by me', async () => {

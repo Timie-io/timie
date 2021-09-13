@@ -162,8 +162,32 @@ describe('TeamsService', () => {
       projects: [],
     };
     repository.save.mockReturnValue(output);
-    const result = await service.addUser(input as Team, user as User);
+    const result = await service.addMember(input as Team, user as User);
     expect(input.members).toEqual([user]);
+    expect(result).toEqual(output);
+  });
+
+  it('should remove a user as a team member', async () => {
+    const input: Partial<Team> = {
+      id: 1,
+      name: 'My Awesome Team',
+      description: 'An awesome team',
+      owner: user as User,
+      members: [user as User],
+      projects: [],
+    };
+    const output = {
+      id: 1,
+      name: 'My Awesome Team',
+      description: 'An awesome team',
+      owner: user,
+      members: [],
+      ownedProjects: [],
+      projects: [],
+    };
+    repository.save.mockReturnValue(output);
+    const result = await service.removeMember(input as Team, user as User);
+    expect(input.members).toEqual([]);
     expect(result).toEqual(output);
   });
 

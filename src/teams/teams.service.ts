@@ -57,8 +57,13 @@ export class TeamsService {
     return await this.repository.save(team);
   }
 
-  async addUser(team: Team, user: User): Promise<Team> {
+  async addMember(team: Team, user: User): Promise<Team> {
     team.members.push(user);
+    return await this.repository.save(team);
+  }
+
+  async removeMember(team: Team, user: User): Promise<Team> {
+    team.members = team.members.filter((member) => member.id !== user.id);
     return await this.repository.save(team);
   }
 
