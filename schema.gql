@@ -68,19 +68,6 @@ type Status {
   assignments: [Assignment!]!
 }
 
-type UserOutput {
-  id: ID
-  name: String
-  email: String
-  creationDate: Date
-  isAdmin: Boolean
-  ownedTeams: [Team!]
-  teams: [Team!]
-  tasks: [Task!]
-  myTasks: [Task!]
-  assignments: [Assignment!]
-}
-
 type TeamsResult {
   result: [Team!]!
   total: Int!
@@ -115,7 +102,7 @@ type EntriesResult {
 
 type Query {
   user(id: ID!): User!
-  users: [UserOutput!]!
+  users: [User!]!
   loggedUser: User!
   team(id: ID!): Team!
   teams(skip: Int = 0, take: Int = 25, name: String, ownerId: ID): TeamsResult
