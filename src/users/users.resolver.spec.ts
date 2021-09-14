@@ -27,7 +27,6 @@ describe('UsersResolver', () => {
       email: user.email,
       creationDate: user.creationDate,
       isAdmin: user.isAdmin,
-      password: user.password,
       teams: [],
       ownedTeams: [],
       tasks: [],

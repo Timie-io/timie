@@ -7,7 +7,6 @@ type User {
   name: String!
   email: String!
   creationDate: Date!
-  password: String!
   isAdmin: Boolean!
   ownedTeams: [Team!]
   teams: [Team!]

@@ -17,9 +17,6 @@ export class User {
   @Field()
   creationDate: Date;
 
-  @Field()
-  password: string;
-
   @Field({ defaultValue: false })
   isAdmin: boolean;
 

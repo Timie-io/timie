@@ -37,7 +37,6 @@ describe('TasksResolver', () => {
       email: 'staylor@mail.com',
       creationDate: new Date(),
       isAdmin: false,
-      password: 'somehashedpassword',
     };
     project = {
       id: 1,
