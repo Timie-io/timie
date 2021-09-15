@@ -29,7 +29,7 @@ export class TasksService {
       skip: args.skip,
       take: args.take,
       order: {
-        id: 'DESC',
+        priority: 'DESC',
       },
       relations,
     } as FindManyOptions;
