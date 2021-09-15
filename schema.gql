@@ -42,6 +42,7 @@ type Task {
   description: String!
   priority: Int!
   creationDate: Date!
+  lastModified: Date
   project: Project!
   active: Boolean!
   creator: User!

@@ -20,6 +20,9 @@ export class Task {
   @Field()
   creationDate: Date;
 
+  @Field({ nullable: true })
+  lastModified: Date;
+
   @Field((type) => Project)
   project: Project;
 

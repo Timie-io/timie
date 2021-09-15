@@ -201,6 +201,7 @@ describe('Tasks E2E Tests', () => {
         updateTask(id: $id, data: $data) {
           title
           description
+          lastModified
         }
       }
     `;
@@ -225,6 +226,8 @@ describe('Tasks E2E Tests', () => {
     expect(updateTask).toBeDefined();
     expect(updateTask.title).toEqual(taskTitle);
     expect(updateTask.description).toEqual(newDesc);
+    expect(updateTask.lastModified).toBeDefined();
+    expect(updateTask.lastModified).not.toBeNull();
 
     taskDesc = newDesc; // IMPORTANT
   });

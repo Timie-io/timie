@@ -103,7 +103,8 @@ describe('TasksService', () => {
     expect(
       await service.update(task as Task, { description: 'Task Updated' }),
     ).toEqual(newTask);
-    expect(task).toEqual(newTask);
+    expect(task.description).toEqual(newTask.description);
+    expect(task.lastModified).toBeDefined();
   });
 
   it('should remove a task', async () => {

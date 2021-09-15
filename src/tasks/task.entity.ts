@@ -28,6 +28,9 @@ export class Task {
   @Column({ default: () => 'now()' })
   creationDate: Date;
 
+  @Column({ nullable: true })
+  lastModified: Date;
+
   @ManyToMany(() => User, (user) => user.tasks)
   @JoinTable()
   followers: User[];

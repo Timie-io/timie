@@ -63,6 +63,7 @@ export class TasksService {
 
   async update(task: Task, data: Partial<Task>): Promise<Task> {
     Object.assign(task, data);
+    task.lastModified = new Date();
     return await this.repository.save(task);
   }
 
