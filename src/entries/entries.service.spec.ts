@@ -56,8 +56,7 @@ describe('EntriesService', () => {
     repository.save.mockReturnValue(entry);
     const assignment: Partial<Assignment> = {
       id: 1,
-      title: 'Assignment',
-      description: 'This is an assignment',
+      note: 'Assignment',
     };
     expect(await service.create(entry, assignment as Assignment)).toEqual(
       entry,

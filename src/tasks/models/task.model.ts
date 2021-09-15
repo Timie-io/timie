@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Assignment } from '../../assignments/models/assignment.model';
 import { Project } from '../../projects/models/project.model';
 import { User } from '../../users/models/user.model';
 
@@ -30,4 +31,7 @@ export class Task {
 
   @Field((type) => [User], { nullable: 'items' })
   followers: User[];
+
+  @Field((type) => [Assignment], { nullable: 'items' })
+  assignments: Assignment[];
 }

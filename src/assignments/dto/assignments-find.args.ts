@@ -8,7 +8,4 @@ export class AssignmentsFindArgs extends FindArgs {
 
   @Field((type) => ID, { nullable: true })
   taskId: string;
-
-  @Field({ nullable: true })
-  title: string;
 }

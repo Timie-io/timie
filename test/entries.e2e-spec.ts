@@ -26,8 +26,7 @@ describe('Entries E2E Tests', () => {
   const taskTitle = 'Amazing Task'; // could be duplicated
   const taskDesc = 'This is an amazing task';
 
-  const assignmentTitle = 'Assignment'; // could be duplicated
-  const assignmentDesc = 'This is an assignment';
+  const assignmentNote = 'This is an assignment';
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -155,8 +154,7 @@ describe('Entries E2E Tests', () => {
         query: print(createAssignmentMutation),
         variables: {
           data: {
-            title: assignmentTitle,
-            description: assignmentDesc,
+            note: assignmentNote,
             deadline: new Date(2021, 9, 21, 19).toISOString(),
             taskId: taskId,
             userId: userId,
@@ -182,8 +180,7 @@ describe('Entries E2E Tests', () => {
           finishTime
           assignment {
             id
-            title
-            description
+            note
           }
         }
       }
@@ -209,8 +206,7 @@ describe('Entries E2E Tests', () => {
     expect(createEntry.finishTime).toBeNull();
     expect(createEntry.assignment).toBeDefined();
     expect(createEntry.assignment.id).toEqual(assignmentId);
-    expect(createEntry.assignment.title).toEqual(assignmentTitle);
-    expect(createEntry.assignment.description).toEqual(assignmentDesc);
+    expect(createEntry.assignment.note).toEqual(assignmentNote);
 
     entryId = createEntry.id;
   });

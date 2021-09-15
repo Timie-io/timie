@@ -39,11 +39,8 @@ export class Assignment {
   @Column({ nullable: true })
   deadline: Date;
 
-  @Column()
-  title: string;
-
-  @Column()
-  description: string;
+  @Column({ nullable: true })
+  note: string;
 
   @ManyToOne(() => Status, (status) => status.assignments, { nullable: true })
   status: Status;

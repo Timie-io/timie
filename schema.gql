@@ -46,6 +46,7 @@ type Task {
   active: Boolean!
   creator: User!
   followers: [User]!
+  assignments: [Assignment]!
 }
 
 type Assignment {
@@ -55,8 +56,7 @@ type Assignment {
   user: User!
   task: Task!
   deadline: Date
-  title: String!
-  description: String!
+  note: String
   status: Status!
 }
 
@@ -112,7 +112,7 @@ type Query {
   task(id: ID!): Task!
   tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean): TasksResult!
   assignment(id: ID!): Assignment!
-  assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, title: String): AssignmentsResult!
+  assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID): AssignmentsResult!
   status(code: ID!): Status!
   statuses: [Status!]!
   entry(id: ID!): ID!
@@ -182,16 +182,14 @@ input UpdateTaskInput {
 
 input NewAssignmentInput {
   taskId: ID!
-  title: String!
-  description: String!
+  note: String
   deadline: Date
   userId: ID
   statusCode: ID
 }
 
 input UpdateAssignmentInput {
-  title: String
-  description: String
+  note: String
   deadline: Date
   userId: ID
   statusCode: ID

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Status } from '../status/status.entity';
 import { Task } from '../tasks/task.entity';
 import { User } from '../users/user.entity';
@@ -33,9 +33,6 @@ export class AssignmentsService {
     }
     if (args.taskId) {
       Object.assign(filter.where, { taskId: Number(args.taskId) });
-    }
-    if (args.title) {
-      Object.assign(filter.where, { title: ILike(`%${args.title}%`) });
     }
     return await this.repository.findAndCount(filter);
   }

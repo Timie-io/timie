@@ -18,8 +18,7 @@ describe('EntriesResolver', () => {
   beforeEach(async () => {
     assignment = {
       id: 1,
-      title: 'Assignment',
-      description: 'Some assignment',
+      note: 'Assignment',
     };
 
     entry = {

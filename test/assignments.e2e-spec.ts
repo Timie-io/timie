@@ -25,8 +25,7 @@ describe('Assignments E2E Tests', () => {
   const taskTitle = 'Amazing Task'; // could be duplicated
   const taskDesc = 'This is an amazing task';
 
-  let assignmentTitle = 'Assignment'; // could be duplicated
-  const assignmentDesc = 'This is an assignment';
+  let assignmentNote = 'Assignment';
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -143,8 +142,7 @@ describe('Assignments E2E Tests', () => {
       mutation createAssignment($data: NewAssignmentInput!) {
         createAssignment(data: $data) {
           id
-          title
-          description
+          note
           status {
             code
           }
@@ -165,8 +163,7 @@ describe('Assignments E2E Tests', () => {
         query: print(createAssignmentMutation),
         variables: {
           data: {
-            title: assignmentTitle,
-            description: assignmentDesc,
+            note: assignmentNote,
             deadline: new Date(2021, 9, 21, 19).toISOString(),
             taskId: taskId,
             userId: userId,
@@ -179,8 +176,7 @@ describe('Assignments E2E Tests', () => {
       data: { createAssignment },
     } = res.body;
     expect(createAssignment).toBeDefined();
-    expect(createAssignment.title).toEqual(assignmentTitle);
-    expect(createAssignment.description).toEqual(assignmentDesc);
+    expect(createAssignment.note).toEqual(assignmentNote);
     expect(createAssignment.status).toBeDefined();
     expect(createAssignment.status.code).toEqual(statusCode);
     expect(createAssignment.task).toBeDefined();
@@ -195,8 +191,7 @@ describe('Assignments E2E Tests', () => {
     const getAssignmentQuery = gql`
       query getAssignment($id: ID!) {
         assignment(id: $id) {
-          title
-          description
+          note
         }
       }
     `;
@@ -215,8 +210,7 @@ describe('Assignments E2E Tests', () => {
       data: { assignment },
     } = res.body;
     expect(assignment).toBeDefined();
-    expect(assignment.title).toEqual(assignmentTitle);
-    expect(assignment.description).toEqual(assignmentDesc);
+    expect(assignment.note).toEqual(assignmentNote);
   });
 
   it('get all assignments', async () => {
@@ -254,11 +248,11 @@ describe('Assignments E2E Tests', () => {
     const updateAssignmentMutation = gql`
       mutation updateAssignment($id: ID!, $data: UpdateAssignmentInput!) {
         updateAssignment(id: $id, data: $data) {
-          title
+          note
         }
       }
     `;
-    const newTitle = 'This Title has been updated';
+    const newNote = 'This note has been updated';
     const res = await request(app.getHttpServer())
       .post('/graphql')
       .set('Authorization', `Bearer ${access_token}`)
@@ -268,7 +262,7 @@ describe('Assignments E2E Tests', () => {
         variables: {
           id: assignmentId,
           data: {
-            title: newTitle,
+            note: newNote,
           },
         },
       });
@@ -277,17 +271,16 @@ describe('Assignments E2E Tests', () => {
       data: { updateAssignment },
     } = res.body;
     expect(updateAssignment).toBeDefined();
-    expect(updateAssignment.title).toEqual(newTitle);
+    expect(updateAssignment.note).toEqual(newNote);
 
-    assignmentTitle = newTitle;
+    assignmentNote = newNote;
   });
 
   it('remove an assignment', async () => {
     const removeAssignmentMutation = gql`
       mutation removeAssignment($id: ID!) {
         removeAssignment(id: $id) {
-          title
-          description
+          note
         }
       }
     `;
@@ -306,7 +299,6 @@ describe('Assignments E2E Tests', () => {
       data: { removeAssignment },
     } = res.body;
     expect(removeAssignment).toBeDefined();
-    expect(removeAssignment.title).toEqual(assignmentTitle);
-    expect(removeAssignment.description).toEqual(assignmentDesc);
+    expect(removeAssignment.note).toEqual(assignmentNote);
   });
 });

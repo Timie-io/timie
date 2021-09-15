@@ -65,6 +65,15 @@ export class TasksResolver {
     return followers;
   }
 
+  @ResolveField()
+  async assignments(@Parent() task: Task) {
+    const { assignments } = await this.tasksService.findOneById(
+      Number(task.id),
+      'assignments',
+    );
+    return assignments;
+  }
+
   @Query((returns) => Task)
   @UseGuards(GqlAuthGuard)
   async task(@Args('id', { type: () => ID }) id: string) {

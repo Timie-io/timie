@@ -47,11 +47,10 @@ describe('AssignmentsService', () => {
     };
 
     assignment = {
-      title: 'This is a task assignment',
+      note: 'This is a task assignment',
       user: user as User,
       task: task as Task,
       status: status as Status,
-      description: 'This is the assignment description',
     };
 
     service = module.get<AssignmentsService>(AssignmentsService);
@@ -95,15 +94,15 @@ describe('AssignmentsService', () => {
   });
 
   it('should update one', async () => {
-    const newTitle = 'This Title is Updated';
-    repository.save.mockReturnValue({ ...assignment, title: newTitle });
+    const newNote = 'This note is updated';
+    repository.save.mockReturnValue({ ...assignment, note: newNote });
     let updatedAssignment = await service.update(
       assignment as Assignment,
       undefined,
       undefined,
-      { title: newTitle },
+      { note: newNote },
     );
-    expect(updatedAssignment.title).toEqual(newTitle);
+    expect(updatedAssignment.note).toEqual(newNote);
     const newUser = { ...user, id: 2 };
     repository.save.mockReturnValue({ ...assignment, user: newUser });
     updatedAssignment = await service.update(

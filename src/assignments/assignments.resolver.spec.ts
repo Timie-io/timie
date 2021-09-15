@@ -52,8 +52,7 @@ describe('AssignmentsResolver', () => {
 
     assignment = {
       id: 1,
-      title: 'An assignment',
-      description: 'This is an assignment',
+      note: 'An assignment',
       status: status as Status,
       user: user as User,
       creator: user as User,
@@ -159,7 +158,7 @@ describe('AssignmentsResolver', () => {
 
   it('should update one', async () => {
     const updateData: UpdateAssignmentInput = {
-      title: 'This title is updated',
+      note: 'This note is updated',
     };
     expect(await resolver.updateAssignment('1', updateData)).toEqual({
       ...assignment,

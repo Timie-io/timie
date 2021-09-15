@@ -23,11 +23,8 @@ export class Assignment {
   @Field({ nullable: true })
   deadline: Date;
 
-  @Field()
-  title: string;
-
-  @Field()
-  description: string;
+  @Field({ nullable: true })
+  note: string;
 
   @Field((type) => Status)
   status: Status;
