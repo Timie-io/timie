@@ -45,7 +45,7 @@ type Task {
   project: Project!
   active: Boolean!
   creator: User!
-  followers: [User!]!
+  followers: [User]!
 }
 
 type Assignment {

@@ -28,6 +28,6 @@ export class Task {
   @Field((type) => User)
   creator: User;
 
-  @Field((type) => [User])
+  @Field((type) => [User], { nullable: 'items' })
   followers: User[];
 }
