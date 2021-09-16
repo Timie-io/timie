@@ -30,6 +30,8 @@ export class TasksService {
       take: args.take,
       order: {
         priority: 'DESC',
+        creationDate: 'DESC',
+        lastModified: 'DESC',
       },
       relations,
     } as FindManyOptions;
