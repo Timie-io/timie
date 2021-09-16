@@ -91,7 +91,7 @@ export class TasksResolver {
     return assignments;
   }
 
-  @Query((returns) => Task)
+  @Query((returns) => Task, { complexity: -20 })
   @UseGuards(GqlAuthGuard)
   async task(@Args('id', { type: () => ID }) id: string) {
     const task = await this.tasksService.findOneById(Number(id));
