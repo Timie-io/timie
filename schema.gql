@@ -34,6 +34,7 @@ type Project {
   creationDate: Date!
   owner: User!
   team: Team
+  active: Boolean!
 }
 
 type Task {
@@ -159,11 +160,13 @@ input UpdateTeamInput {
 input NewProjectInput {
   name: String!
   description: String!
+  active: Boolean = true
 }
 
 input UpdateProjectInput {
   name: String
   description: String
+  active: Boolean = true
 }
 
 input NewTaskInput {

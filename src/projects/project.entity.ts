@@ -23,6 +23,9 @@ export class Project {
   @Column({ default: () => 'now()' })
   creationDate: Date;
 
+  @Column({ default: true })
+  active: boolean;
+
   @ManyToOne(() => User, (user) => user.projects)
   owner: User;
 

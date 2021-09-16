@@ -21,4 +21,7 @@ export class Project {
 
   @Field((type) => Team, { nullable: true })
   team: Team;
+
+  @Field({ defaultValue: true })
+  active: boolean;
 }

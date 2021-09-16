@@ -10,4 +10,7 @@ export class NewProjectInput {
   @Field()
   @MaxLength(256)
   description: string;
+
+  @Field({ defaultValue: true })
+  active: boolean;
 }
