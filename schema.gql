@@ -109,7 +109,7 @@ type Query {
   teams(skip: Int = 0, take: Int = 25, name: String, ownerId: ID): TeamsResult
   myTeams: [Team!]
   project(id: ID!): Project!
-  projects(skip: Int = 0, take: Int = 25, name: String, ownerId: ID, teamId: ID): ProjectsResult!
+  projects(skip: Int = 0, take: Int = 25, name: String, active: Boolean, ownerId: ID, teamId: ID): ProjectsResult!
   myProjects: [Project!]
   task(id: ID!): Task!
   tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean): TasksResult!

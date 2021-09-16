@@ -6,6 +6,9 @@ export class ProjectsFindArgs extends FindArgs {
   @Field({ nullable: true })
   name: string;
 
+  @Field({ nullable: true })
+  active: boolean;
+
   @Field((type) => ID, { nullable: true })
   ownerId: string;
 

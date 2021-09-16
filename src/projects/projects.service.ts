@@ -36,6 +36,9 @@ export class ProjectsService {
     if (args.name) {
       Object.assign(filter.where, { name: ILike(`%${args.name}%`) });
     }
+    if (args.active) {
+      Object.assign(filter.where, { active: args.active });
+    }
     if (args.ownerId) {
       Object.assign(filter.where, { ownerId: args.ownerId });
     }
