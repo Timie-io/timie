@@ -174,6 +174,23 @@ export class TasksResolver {
     return await this.tasksService.addFollower(task, follower);
   }
 
+  @Mutation((returns) => Task)
+  @UseGuards(GqlAuthGuard)
+  async removeTaskFollower(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('userId', { type: () => ID }) userId: string,
+  ) {
+    const task = await this.tasksService.findOneById(Number(id), 'followers');
+    if (!task) {
+      throw new NotFoundException('task not found');
+    }
+    const follower = await this.usersService.findOneById(Number(userId));
+    if (!follower) {
+      throw new BadRequestException('user not found');
+    }
+    return await this.tasksService.removeFollower(task, follower);
+  }
+
   @Subscription((returns) => Task, {
     filter: (payload, variables) => {
       return filterSubscriptionInput(payload.taskAdded, variables.input);

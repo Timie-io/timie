@@ -76,8 +76,14 @@ describe('TasksResolver', () => {
         Object.assign(task, data);
         return task as Task;
       },
-      async addFollower(task, follower) {
-        task.followers.push(follower);
+      async addFollower(task, user) {
+        task.followers.push(user);
+        return task;
+      },
+      async removeFollower(task, user) {
+        task.followers = task.followers.filter(
+          (follower) => follower.id !== user.id,
+        );
         return task;
       },
     };
@@ -164,5 +170,15 @@ describe('TasksResolver', () => {
     const updatedTask = await resolver.addTaskFollower('1', '2');
     expect(updatedTask.followers.length).toEqual(2);
     expect(updatedTask.followers).toContain(follower);
+  });
+
+  it('should remove a user as follower', async () => {
+    const follower = { ...user, id: 2 };
+    usersService.findOneById = async (id, ...relations) => {
+      return follower as User;
+    };
+    const updatedTask = await resolver.removeTaskFollower('1', '2');
+    expect(updatedTask.followers.length).toEqual(1);
+    expect(updatedTask.followers).not.toContain(follower);
   });
 });

@@ -266,6 +266,40 @@ describe('Tasks E2E Tests', () => {
     expect(addTaskFollower.followers).toHaveLength(1);
   });
 
+  it('remove a task follower', async () => {
+    const removeFollowerMutation = gql`
+      mutation removeTaskFollower($id: ID!, $userId: ID!) {
+        removeTaskFollower(id: $id, userId: $userId) {
+          title
+          description
+          followers {
+            id
+          }
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send({
+        operationName: 'removeTaskFollower',
+        query: print(removeFollowerMutation),
+        variables: {
+          id: taskId,
+          userId: userId,
+        },
+      });
+    expect(res.body.data).toBeDefined();
+    const {
+      data: { removeTaskFollower },
+    } = res.body;
+    expect(removeTaskFollower).toBeDefined();
+    expect(removeTaskFollower.title).toEqual(taskTitle);
+    expect(removeTaskFollower.description).toEqual(taskDesc);
+    expect(removeTaskFollower.followers).toBeDefined();
+    expect(removeTaskFollower.followers).toHaveLength(0);
+  });
+
   it('remove a task', async () => {
     const removeTaskMutation = gql`
       mutation removeTask($id: ID!) {

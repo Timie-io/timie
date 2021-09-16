@@ -69,8 +69,14 @@ export class TasksService {
     return await this.repository.save(task);
   }
 
-  async addFollower(task: Task, follower: User): Promise<Task> {
-    task.followers.push(follower);
+  async addFollower(task: Task, user: User): Promise<Task> {
+    task.followers.push(user);
+    return await this.repository.save(task);
+  }
+  async removeFollower(task: Task, user: User): Promise<Task> {
+    task.followers = task.followers.filter(
+      (follower) => follower.id !== user.id,
+    );
     return await this.repository.save(task);
   }
 }

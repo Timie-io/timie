@@ -134,6 +134,7 @@ type Mutation {
   updateTask(data: UpdateTaskInput!, id: ID!): Task!
   removeTask(id: ID!): Task!
   addTaskFollower(userId: ID!, id: ID!): Task!
+  removeTaskFollower(userId: ID!, id: ID!): Task!
   createAssignment(data: NewAssignmentInput!): Assignment!
   updateAssignment(data: UpdateAssignmentInput!, id: ID!): Assignment!
   removeAssignment(id: ID!): Assignment!

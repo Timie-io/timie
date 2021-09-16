@@ -111,4 +111,18 @@ describe('TasksService', () => {
     repository.remove.mockReturnValue(task);
     expect(await service.remove(task as Task)).toEqual(task);
   });
+
+  it('should add a follower', async () => {
+    task.followers = [];
+    repository.save.mockReturnValue(task);
+    const newTask = await service.addFollower(task as Task, user as User);
+    expect(newTask.followers).toEqual([user]);
+  });
+
+  it('should remove a follower', async () => {
+    task.followers = [user as User];
+    repository.save.mockReturnValue(task);
+    const newTask = await service.removeFollower(task as Task, user as User);
+    expect(newTask.followers).toEqual([]);
+  });
 });
