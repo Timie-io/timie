@@ -26,9 +26,26 @@ import { TasksFindArgs } from './dto/tasks-find.args';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { Task } from './models/task.model';
 import { TasksResult } from './models/tasks-result.model';
+import { Task as TaskEntity } from './task.entity';
 import { TasksService } from './tasks.service';
 
 const pubSub = new PubSub();
+
+function filterSubscriptionInput(task: TaskEntity, input: TaskAddedInput) {
+  let output = true;
+  if (input) {
+    if (input.title) {
+      output = task.title.includes(input.title);
+    }
+    if (output && input.active) {
+      output = task.active === input.active;
+    }
+    if (output && input.projectId) {
+      output = task.projectId === Number(input.projectId);
+    }
+  }
+  return output;
+}
 
 @Resolver((of) => Task)
 export class TasksResolver {
@@ -159,12 +176,7 @@ export class TasksResolver {
 
   @Subscription((returns) => Task, {
     filter: (payload, variables) => {
-      if (variables.input && variables.input.projectId) {
-        return (
-          payload.taskAdded.projectId === Number(variables.input.projectId)
-        );
-      }
-      return true;
+      return filterSubscriptionInput(payload.taskAdded, variables.input);
     },
   })
   @UseGuards(GqlAuthGuard)
@@ -174,12 +186,7 @@ export class TasksResolver {
 
   @Subscription((returns) => Task, {
     filter: (payload, variables) => {
-      if (variables.input && variables.input.projectId) {
-        return (
-          payload.taskAdded.projectId === Number(variables.input.projectId)
-        );
-      }
-      return true;
+      return filterSubscriptionInput(payload.taskRemoved, variables.input);
     },
   })
   @UseGuards(GqlAuthGuard)

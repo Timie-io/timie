@@ -244,6 +244,8 @@ input ProjectAddedInput {
 }
 
 input TaskAddedInput {
+  title: String
+  active: Boolean
   projectId: ID
 }
 
