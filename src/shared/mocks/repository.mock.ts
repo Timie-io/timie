@@ -9,4 +9,5 @@ export const MockRepository = jest.fn(() => ({
   findOne: jest.fn(),
   remove: jest.fn(),
   findAndCount: jest.fn(),
+  createQueryBuilder: jest.fn(),
 }));

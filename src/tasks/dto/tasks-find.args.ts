@@ -11,4 +11,7 @@ export class TasksFindArgs extends FindArgs {
 
   @Field({ nullable: true })
   active: boolean;
+
+  @Field((type) => [ID], { nullable: true })
+  followerIds: string[];
 }

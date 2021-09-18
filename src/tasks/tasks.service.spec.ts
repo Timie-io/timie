@@ -85,7 +85,14 @@ describe('TasksService', () => {
 
   it('should find all tasks', async () => {
     const output = [task, { ...task, id: 2 }];
-    repository.findAndCount.mockReturnValue([output, 2]);
+    const query = {
+      getCount: () => 2,
+      getMany: () => output,
+    };
+    repository.createQueryBuilder.mockReturnValue({
+      andWhere: () => query,
+      ...query,
+    });
     expect(
       await service.findAll({
         skip: 0,
@@ -93,6 +100,7 @@ describe('TasksService', () => {
         title: undefined,
         projectId: undefined,
         active: true,
+        followerIds: [],
       }),
     ).toEqual([output, 2]);
   });

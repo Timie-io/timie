@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
 import { TasksFindArgs } from './dto/tasks-find.args';
@@ -24,27 +24,32 @@ export class TasksService {
     args: TasksFindArgs,
     ...relations: string[]
   ): Promise<[Task[], number]> {
-    const filter = {
-      where: {},
-      skip: args.skip,
-      take: args.take,
-      order: {
-        priority: 'DESC',
-        creationDate: 'DESC',
-        lastModified: 'DESC',
-      },
-      relations,
-    } as FindManyOptions;
+    let query = this.repository.createQueryBuilder('task');
     if (args.title) {
-      Object.assign(filter.where, { title: ILike(`%${args.title}%`) });
+      console.log('Filter by title:', args.title);
+      query = query.andWhere('task.title ilike :title', {
+        title: `%${args.title}%`,
+      });
     }
     if (args.active !== undefined) {
-      Object.assign(filter.where, { active: args.active });
+      query = query.andWhere('task.active = :active', { active: args.active });
     }
     if (args.projectId) {
-      Object.assign(filter.where, { projectId: Number(args.projectId) });
+      query = query.andWhere('task.project = :projectId', {
+        projectId: Number(args.projectId),
+      });
     }
-    return await this.repository.findAndCount(filter);
+    if (args.followerIds && args.followerIds.length > 0) {
+      query = query.innerJoin(
+        'task.followers',
+        'follower',
+        'follower.id IN (:...followerIds)',
+        { followerIds: args.followerIds.map((f) => Number(f)) },
+      );
+    }
+    const total = await query.getCount();
+    const result = await query.getMany();
+    return [result, total];
   }
 
   async create(
