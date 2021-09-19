@@ -59,7 +59,7 @@ type Assignment {
   task: Task!
   deadline: Date
   note: String
-  status: Status!
+  status: Status
 }
 
 type Status {

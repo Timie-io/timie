@@ -87,7 +87,7 @@ export class AssignmentsResolver {
     return assignment;
   }
 
-  @Query((returns) => AssignmentsResult)
+  @Query((returns) => AssignmentsResult, { complexity: -10 })
   @UseGuards(GqlAuthGuard)
   async assignments(@Args() args: AssignmentsFindArgs) {
     const [result, total] = await this.assignmentsService.findAll(args);

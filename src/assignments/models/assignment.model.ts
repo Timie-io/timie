@@ -26,6 +26,6 @@ export class Assignment {
   @Field({ nullable: true })
   note: string;
 
-  @Field((type) => Status)
+  @Field((type) => Status, { nullable: true })
   status: Status;
 }
