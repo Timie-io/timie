@@ -123,14 +123,15 @@ export class AssignmentsResolver {
     if (statusCode) {
       status = await this.statusService.findOneByCode(statusCode);
     }
-    pubSub.publish('assignmentAdded', { assignmentAdded: assignment });
-    return await this.assignmentsService.create(
+    const output = await this.assignmentsService.create(
       assignment,
       task,
       user,
       creator,
       status,
     );
+    pubSub.publish('assignmentAdded', { assignmentAdded: output });
+    return output;
   }
 
   @Mutation((returns) => Assignment)
@@ -194,7 +195,9 @@ export class AssignmentsResolver {
   @Subscription((returns) => Assignment, {
     filter: (payload, variables) => {
       if (variables.input && variables.input.taskId) {
-        return payload.taskAdded.taskId === Number(variables.input.taskId);
+        return (
+          payload.assignmentRemoved.taskId === Number(variables.input.taskId)
+        );
       }
       return true;
     },
