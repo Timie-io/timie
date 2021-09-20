@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Entry } from '../../entries/models/entry.model';
 import { Status } from '../../status/models/status.model';
 import { Task } from '../../tasks/models/task.model';
 import { User } from '../../users/models/user.model';
@@ -28,4 +29,10 @@ export class Assignment {
 
   @Field((type) => Status, { nullable: true })
   status: Status;
+
+  @Field((type) => [Entry], { nullable: 'itemsAndList' })
+  entries: Entry[];
+
+  @Field({ nullable: true })
+  totalTime: number;
 }

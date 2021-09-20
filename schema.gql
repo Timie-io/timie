@@ -2,6 +2,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Entry {
+  id: ID!
+  startTime: Date
+  finishTime: Date
+  assignment: Assignment!
+}
+
+"""Date custom scalar type"""
+scalar Date
+
 type User {
   id: ID!
   name: String!
@@ -14,9 +24,6 @@ type User {
   myTasks: [Task!]
   assignments: [Assignment!]
 }
-
-"""Date custom scalar type"""
-scalar Date
 
 type Team {
   id: ID!
@@ -60,6 +67,8 @@ type Assignment {
   deadline: Date
   note: String
   status: Status
+  entries: [Entry]
+  totalTime: Int
 }
 
 type Status {
@@ -87,13 +96,6 @@ type TasksResult {
 type AssignmentsResult {
   result: [Assignment!]!
   total: Int!
-}
-
-type Entry {
-  id: ID!
-  startTime: Date
-  finishTime: Date
-  assignment: Assignment!
 }
 
 type EntriesResult {
@@ -231,6 +233,8 @@ type Subscription {
   taskRemoved(input: TaskAddedInput): Task!
   assignmentAdded(input: AssignmentAddedInput): Assignment!
   assignmentRemoved(input: AssignmentAddedInput): Assignment!
+  entryAdded(input: EntryChangedInput): Entry!
+  entryRemoved(input: EntryChangedInput): Entry!
   entryStarted(input: EntryChangedInput): Entry!
   entryStopped(input: EntryChangedInput): Entry!
 }

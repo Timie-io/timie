@@ -68,7 +68,9 @@ export class EntriesResolver {
     if (!assignment) {
       throw new BadRequestException('assignment not found');
     }
-    return await this.entriesService.create(entryData, assignment);
+    const entry = await this.entriesService.create(entryData, assignment);
+    pubSub.publish('entryAdded', entry);
+    return entry;
   }
 
   @Mutation((returns) => Entry)
@@ -93,6 +95,7 @@ export class EntriesResolver {
     }
     const copy = { ...entry };
     await this.entriesService.remove(entry);
+    pubSub.publish('entryRemoved', copy);
     return copy;
   }
 
@@ -116,6 +119,38 @@ export class EntriesResolver {
     }
     pubSub.publish('entryStopped', { entryStopped: entry });
     return await this.entriesService.stop(entry);
+  }
+
+  @Subscription((returns) => Entry, {
+    filter: (payload, variables) => {
+      if (variables.input && variables.input.assignmentId) {
+        return (
+          payload.entryAdded.assignmentId ===
+          Number(variables.input.assignmentId)
+        );
+      }
+      return true;
+    },
+  })
+  @UseGuards(GqlAuthGuard)
+  entryAdded(@Args('input', { nullable: true }) input: EntryChangedInput) {
+    return pubSub.asyncIterator('entryAdded');
+  }
+
+  @Subscription((returns) => Entry, {
+    filter: (payload, variables) => {
+      if (variables.input && variables.input.assignmentId) {
+        return (
+          payload.entryRemoved.assignmentId ===
+          Number(variables.input.assignmentId)
+        );
+      }
+      return true;
+    },
+  })
+  @UseGuards(GqlAuthGuard)
+  entryRemoved(@Args('input', { nullable: true }) input: EntryChangedInput) {
+    return pubSub.asyncIterator('entryRemoved');
   }
 
   @Subscription((returns) => Entry, {

@@ -77,6 +77,30 @@ export class AssignmentsResolver {
     return task;
   }
 
+  @ResolveField()
+  async entries(@Parent() assignment: Assignment) {
+    const { entries } = await this.assignmentsService.findOneById(
+      Number(assignment.id),
+      'entries',
+    );
+    return entries;
+  }
+
+  @ResolveField()
+  async totalTime(@Parent() assignment: Assignment) {
+    const { entries } = await this.assignmentsService.findOneById(
+      Number(assignment.id),
+      'entries',
+    );
+    let total = 0;
+    for (let entry of entries) {
+      if (entry.startTime && entry.finishTime) {
+        total += Number(entry.finishTime) - Number(entry.startTime);
+      }
+    }
+    return total;
+  }
+
   @Query((returns) => Assignment)
   @UseGuards(GqlAuthGuard)
   async assignment(@Args('id', { type: () => ID }) id: string) {
