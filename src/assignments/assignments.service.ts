@@ -22,19 +22,29 @@ export class AssignmentsService {
     args: AssignmentsFindArgs,
     ...relations: string[]
   ): Promise<[Assignment[], number]> {
-    const filter = {
-      where: {},
-      skip: args.skip,
-      take: args.take,
-      relations,
-    };
+    let query = this.repository.createQueryBuilder('assignment');
     if (args.userId) {
-      Object.assign(filter.where, { userId: Number(args.userId) });
+      query = query.andWhere('assignment.userId = :userId', {
+        userId: args.userId,
+      });
     }
     if (args.taskId) {
-      Object.assign(filter.where, { taskId: Number(args.taskId) });
+      query = query.andWhere('assignment.taskId = :taskId', {
+        taskId: args.taskId,
+      });
     }
-    return await this.repository.findAndCount(filter);
+    if (args.skip) {
+      query = query.skip(args.skip);
+    }
+    if (args.take) {
+      query = query.take(args.take);
+    }
+    query = query.orderBy('assignment.deadline', 'DESC', 'NULLS LAST');
+    query = query.addOrderBy('assignment.creationDate', 'DESC');
+
+    const total = await query.getCount();
+    const result = await query.getMany();
+    return [result, total];
   }
 
   async create(
