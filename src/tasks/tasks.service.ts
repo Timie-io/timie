@@ -47,6 +47,10 @@ export class TasksService {
         { followerIds: args.followerIds.map((f) => Number(f)) },
       );
     }
+    query = query.orderBy('task.priority', 'DESC');
+    query = query.addOrderBy('task.creationDate', 'DESC');
+    query = query.addOrderBy('task.lastModified', 'DESC');
+
     const total = await query.getCount();
     const result = await query.getMany();
     return [result, total];
