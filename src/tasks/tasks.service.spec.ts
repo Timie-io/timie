@@ -88,9 +88,13 @@ describe('TasksService', () => {
     const query = {
       getCount: () => 2,
       getMany: () => output,
+      andWhere: () => query,
+      orderBy: () => query,
+      addOrderBy: () => query,
+      take: () => query,
+      skip: () => query,
     };
     repository.createQueryBuilder.mockReturnValue({
-      andWhere: () => query,
       ...query,
     });
     expect(

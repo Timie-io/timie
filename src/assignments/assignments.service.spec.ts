@@ -71,7 +71,18 @@ describe('AssignmentsService', () => {
       assignment as Assignment,
       { ...assignment, id: 2 } as Assignment,
     ];
-    repository.findAndCount.mockReturnValue([result, 2]);
+    const query = {
+      getCount: () => 2,
+      getMany: () => result,
+      andWhere: () => query,
+      orderBy: () => query,
+      addOrderBy: () => query,
+      take: () => query,
+      skip: () => query,
+    };
+    repository.createQueryBuilder.mockReturnValue({
+      ...query,
+    });
     const args: Partial<AssignmentsFindArgs> = { skip: 0, take: 25 };
     expect(await service.findAll(args as AssignmentsFindArgs)).toEqual([
       result,
