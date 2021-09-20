@@ -47,6 +47,12 @@ export class TasksService {
         { followerIds: args.followerIds.map((f) => Number(f)) },
       );
     }
+    if (args.skip) {
+      query.skip(args.skip);
+    }
+    if (args.take) {
+      query.take(args.take);
+    }
     query = query.orderBy('task.priority', 'DESC');
     query = query.addOrderBy('task.creationDate', 'DESC');
     query = query.addOrderBy('task.lastModified', 'DESC');
