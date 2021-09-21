@@ -96,4 +96,13 @@ export class UsersResolver {
     );
     return assignments;
   }
+
+  @ResolveField()
+  async entries(@Parent() user: User) {
+    const { entries } = await this.usersService.findOneById(
+      Number(user.id),
+      'entries',
+    );
+    return entries;
+  }
 }

@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Assignment } from '../assignments/assignment.entity';
 import { AssignmentsService } from '../assignments/assignments.service';
+import { User } from '../users/user.entity';
+import { UsersService } from './../users/users.service';
 import { EntriesFindArgs } from './dto/entries-find.args';
 import { NewEntryInput } from './dto/new-entry.input';
 import { UpdateEntryInput } from './dto/update-entry.input';
@@ -11,11 +13,19 @@ import { Entry } from './entry.entity';
 describe('EntriesResolver', () => {
   let resolver: EntriesResolver;
   let entriesService: Partial<EntriesService>;
+  let usersService: Partial<UsersService>;
   let assignmentsService: Partial<AssignmentsService>;
   let entry: Partial<Entry>;
+  let user: Partial<User>;
   let assignment: Partial<Assignment>;
 
   beforeEach(async () => {
+    user = {
+      id: 1,
+      name: 'User',
+      email: 'user@mail.com',
+    };
+
     assignment = {
       id: 1,
       note: 'Assignment',
@@ -58,12 +68,22 @@ describe('EntriesResolver', () => {
       },
     };
 
+    usersService = {
+      async findOneById(id, ...relations): Promise<User> {
+        return user as User;
+      },
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EntriesResolver,
         {
           provide: EntriesService,
           useValue: entriesService,
+        },
+        {
+          provide: UsersService,
+          useValue: usersService,
         },
         {
           provide: AssignmentsService,

@@ -1,7 +1,3 @@
-/**
- * User entity
- */
-
 import {
   Column,
   Entity,
@@ -13,6 +9,7 @@ import { Assignment } from '../assignments/assignment.entity';
 import { Project } from '../projects/project.entity';
 import { Task } from '../tasks/task.entity';
 import { Team } from '../teams/team.entity';
+import { Entry } from './../entries/entry.entity';
 
 @Entity()
 export class User {
@@ -54,4 +51,7 @@ export class User {
 
   @OneToMany(() => Assignment, (assignment) => assignment.creator)
   myAssignments: Assignment[];
+
+  @OneToMany(() => Entry, (entry) => entry.user)
+  entries: Entry[];
 }

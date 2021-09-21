@@ -2,29 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Entry {
-  id: ID!
-  startTime: Date
-  finishTime: Date
-  assignment: Assignment!
-}
-
-"""Date custom scalar type"""
-scalar Date
-
-type User {
-  id: ID!
-  name: String!
-  email: String!
-  creationDate: Date!
-  isAdmin: Boolean!
-  ownedTeams: [Team!]
-  teams: [Team!]
-  tasks: [Task!]
-  myTasks: [Task!]
-  assignments: [Assignment!]
-}
-
 type Team {
   id: ID!
   name: String!
@@ -44,6 +21,9 @@ type Project {
   active: Boolean!
 }
 
+"""Date custom scalar type"""
+scalar Date
+
 type Task {
   id: ID!
   title: String!
@@ -56,6 +36,28 @@ type Task {
   creator: User!
   followers: [User]!
   assignments: [Assignment]!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  creationDate: Date!
+  isAdmin: Boolean!
+  ownedTeams: [Team!]
+  teams: [Team!]
+  tasks: [Task!]
+  myTasks: [Task!]
+  assignments: [Assignment!]
+  entries: [Entry!]
+}
+
+type Entry {
+  id: ID!
+  startTime: Date
+  finishTime: Date
+  user: User!
+  assignment: Assignment
 }
 
 type Assignment {
@@ -120,7 +122,7 @@ type Query {
   status(code: ID!): Status!
   statuses: [Status!]!
   entry(id: ID!): ID!
-  entries(skip: Int = 0, take: Int = 25, assignmentId: ID): EntriesResult!
+  entries(skip: Int = 0, take: Int = 25, userId: ID, assignmentId: ID): EntriesResult!
 }
 
 type Mutation {
@@ -216,7 +218,8 @@ input UpdateStatusInput {
 input NewEntryInput {
   startTime: Date
   finishTime: Date
-  assignmentId: ID!
+  userId: ID!
+  assignmentId: ID
 }
 
 input UpdateEntryInput {
@@ -259,5 +262,6 @@ input AssignmentAddedInput {
 }
 
 input EntryChangedInput {
+  userId: ID
   assignmentId: ID
 }

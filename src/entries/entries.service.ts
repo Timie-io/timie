@@ -1,7 +1,8 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
+import { User } from '../users/user.entity';
 import { EntriesFindArgs } from './dto/entries-find.args';
 import { Entry } from './entry.entity';
 
@@ -26,17 +27,30 @@ export class EntriesService {
       where: {},
       skip: args.skip,
       take: args.take,
+      order: {
+        id: 'DESC',
+      },
       relations,
-    };
+    } as FindManyOptions;
+    if (args.userId) {
+      Object.assign(filter.where, { userId: Number(args.userId) });
+    }
     if (args.assignmentId) {
       Object.assign(filter.where, { assignmentId: Number(args.assignmentId) });
     }
     return await this.repository.findAndCount(filter);
   }
 
-  async create(data: Partial<Entry>, assignment: Assignment): Promise<Entry> {
+  async create(
+    data: Partial<Entry>,
+    user: User,
+    assignment?: Assignment,
+  ): Promise<Entry> {
     const entry = this.repository.create(data);
-    entry.assignment = assignment;
+    entry.user = user;
+    if (assignment) {
+      entry.assignment = assignment;
+    }
     return this.repository.save(entry);
   }
 

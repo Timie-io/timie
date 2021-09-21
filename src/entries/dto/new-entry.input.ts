@@ -9,5 +9,8 @@ export class NewEntryInput {
   finishTime: Date;
 
   @Field((type) => ID)
+  userId: string;
+
+  @Field((type) => ID, { nullable: true })
   assignmentId: string;
 }

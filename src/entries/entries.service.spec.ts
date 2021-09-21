@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
 import { MockType } from '../shared/mocks/mock.type';
 import { MockRepository } from '../shared/mocks/repository.mock';
+import { User } from '../users/user.entity';
 import { EntriesFindArgs } from './dto/entries-find.args';
 import { EntriesService } from './entries.service';
 import { Entry } from './entry.entity';
@@ -58,9 +59,14 @@ describe('EntriesService', () => {
       id: 1,
       note: 'Assignment',
     };
-    expect(await service.create(entry, assignment as Assignment)).toEqual(
-      entry,
-    );
+    const user: Partial<User> = {
+      id: 1,
+      name: 'User',
+      email: 'user@mail.com',
+    };
+    expect(
+      await service.create(entry, user as User, assignment as Assignment),
+    ).toEqual(entry);
   });
 
   it('should remove one', async () => {

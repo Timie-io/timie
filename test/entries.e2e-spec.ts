@@ -178,6 +178,9 @@ describe('Entries E2E Tests', () => {
           id
           startTime
           finishTime
+          user {
+            id
+          }
           assignment {
             id
             note
@@ -193,6 +196,7 @@ describe('Entries E2E Tests', () => {
         query: print(createEntryMutation),
         variables: {
           data: {
+            userId: userId,
             assignmentId: assignmentId,
           },
         },
@@ -205,6 +209,7 @@ describe('Entries E2E Tests', () => {
     expect(createEntry.startTime).toBeNull();
     expect(createEntry.finishTime).toBeNull();
     expect(createEntry.assignment).toBeDefined();
+    expect(createEntry.user.id).toEqual(userId);
     expect(createEntry.assignment.id).toEqual(assignmentId);
     expect(createEntry.assignment.note).toEqual(assignmentNote);
 

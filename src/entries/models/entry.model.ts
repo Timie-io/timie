@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Assignment } from '../../assignments/models/assignment.model';
+import { User } from './../../users/models/user.model';
 
 @ObjectType()
 export class Entry {
@@ -12,6 +13,9 @@ export class Entry {
   @Field({ nullable: true })
   finishTime: Date;
 
-  @Field((type) => Assignment)
+  @Field((type) => User)
+  user: User;
+
+  @Field((type) => Assignment, { nullable: true })
   assignment: Assignment;
 }

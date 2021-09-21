@@ -16,6 +16,7 @@ import {
 import { PubSub } from 'graphql-subscriptions';
 import { AssignmentsService } from '../assignments/assignments.service';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
+import { UsersService } from './../users/users.service';
 import { EntriesFindArgs } from './dto/entries-find.args';
 import { EntryChangedInput } from './dto/entry-changed.input';
 import { NewEntryInput } from './dto/new-entry.input';
@@ -30,6 +31,7 @@ const pubSub = new PubSub();
 export class EntriesResolver {
   constructor(
     private readonly entriesService: EntriesService,
+    private readonly usersService: UsersService,
     private readonly assignmentsService: AssignmentsService,
   ) {}
 
@@ -40,6 +42,15 @@ export class EntriesResolver {
       'assignment',
     );
     return assignment;
+  }
+
+  @ResolveField()
+  async user(@Parent() entry: Entry) {
+    const { user } = await this.entriesService.findOneById(
+      Number(entry.id),
+      'user',
+    );
+    return user;
   }
 
   @Query((returns) => ID)
@@ -61,14 +72,18 @@ export class EntriesResolver {
   @Mutation((returns) => Entry)
   @UseGuards(GqlAuthGuard)
   async createEntry(@Args('data') data: NewEntryInput) {
-    const { assignmentId, ...entryData } = data;
-    const assignment = await this.assignmentsService.findOneById(
-      Number(assignmentId),
-    );
-    if (!assignment) {
+    const { assignmentId, userId, ...entryData } = data;
+    const user = await this.usersService.findOneById(Number(userId));
+    if (!user) {
+      throw new BadRequestException('user not found');
+    }
+    const assignment = assignmentId
+      ? await this.assignmentsService.findOneById(Number(assignmentId))
+      : undefined;
+    if (assignmentId && !assignment) {
       throw new BadRequestException('assignment not found');
     }
-    const entry = await this.entriesService.create(entryData, assignment);
+    const entry = await this.entriesService.create(entryData, user, assignment);
     pubSub.publish('entryAdded', entry);
     return entry;
   }
