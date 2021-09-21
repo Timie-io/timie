@@ -26,7 +26,6 @@ export class TasksService {
   ): Promise<[Task[], number]> {
     let query = this.repository.createQueryBuilder('task');
     if (args.title) {
-      console.log('Filter by title:', args.title);
       query = query.andWhere('task.title ilike :title', {
         title: `%${args.title}%`,
       });
