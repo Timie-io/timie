@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, ILike, Repository } from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
 import { User } from '../users/user.entity';
 import { EntriesFindArgs } from './dto/entries-find.args';
@@ -32,6 +32,9 @@ export class EntriesService {
       },
       relations,
     } as FindManyOptions;
+    if (args.note) {
+      Object.assign(filter.where, { note: ILike(`%${args.note}%`) });
+    }
     if (args.userId) {
       Object.assign(filter.where, { userId: Number(args.userId) });
     }
@@ -60,6 +63,9 @@ export class EntriesService {
     entry.user = user;
     if (assignment) {
       entry.assignment = assignment;
+      if (!entry.note) {
+        entry.note = assignment.note;
+      }
     }
     return this.repository.save(entry);
   }

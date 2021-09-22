@@ -124,7 +124,7 @@ type Query {
   status(code: ID!): Status!
   statuses: [Status!]!
   entry(id: ID!): ID!
-  entries(skip: Int = 0, take: Int = 25, userId: ID, assignmentId: ID): EntriesResult!
+  entries(skip: Int = 0, take: Int = 25, note: String, userId: ID, assignmentId: ID): EntriesResult!
 }
 
 type Mutation {
