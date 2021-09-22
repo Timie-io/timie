@@ -19,6 +19,9 @@ export class Entry {
   @Column()
   userId: number;
 
+  @Column({ nullable: true })
+  note: string;
+
   @ManyToOne(() => Assignment, (assignment) => assignment.entries, {
     nullable: true,
   })

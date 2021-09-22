@@ -56,6 +56,7 @@ type Entry {
   id: ID!
   startTime: Date
   finishTime: Date
+  note: String
   user: User!
   assignment: Assignment
 }
@@ -218,6 +219,7 @@ input UpdateStatusInput {
 input NewEntryInput {
   startTime: Date
   finishTime: Date
+  note: String
   userId: ID!
   assignmentId: ID
 }
@@ -225,6 +227,7 @@ input NewEntryInput {
 input UpdateEntryInput {
   startTime: Date
   finishTime: Date
+  note: String
 }
 
 type Subscription {

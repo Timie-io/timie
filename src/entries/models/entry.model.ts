@@ -13,6 +13,9 @@ export class Entry {
   @Field({ nullable: true })
   finishTime: Date;
 
+  @Field({ nullable: true })
+  note: string;
+
   @Field((type) => User)
   user: User;
 
