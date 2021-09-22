@@ -8,4 +8,7 @@ export class EntriesResult {
 
   @Field((type) => Int)
   total: number;
+
+  @Field((type) => Int)
+  totalTime: number;
 }

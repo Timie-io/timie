@@ -41,7 +41,7 @@ describe('EntriesResolver', () => {
         return entry as Entry;
       },
       async findAll(args, ...relations) {
-        return [[entry as Entry], 1];
+        return [[entry as Entry], 1, 0];
       },
       async create(data, assignment) {
         return entry as Entry;
@@ -107,6 +107,7 @@ describe('EntriesResolver', () => {
     expect(await resolver.entries({} as EntriesFindArgs)).toEqual({
       result: [entry as Entry],
       total: 1,
+      totalTime: 0,
     });
   });
 

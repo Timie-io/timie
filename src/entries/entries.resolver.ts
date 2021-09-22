@@ -62,10 +62,11 @@ export class EntriesResolver {
   @Query((returns) => EntriesResult)
   @UseGuards(GqlAuthGuard)
   async entries(@Args() args: EntriesFindArgs) {
-    const [result, total] = await this.entriesService.findAll(args);
+    const [result, total, totalTime] = await this.entriesService.findAll(args);
     return {
       result,
       total,
+      totalTime,
     };
   }
 

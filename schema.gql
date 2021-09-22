@@ -104,6 +104,7 @@ type AssignmentsResult {
 type EntriesResult {
   result: [Entry!]!
   total: Int!
+  totalTime: Int!
 }
 
 type Query {

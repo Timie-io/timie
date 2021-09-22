@@ -45,10 +45,11 @@ describe('EntriesService', () => {
   });
 
   it('should find all', async () => {
-    repository.findAndCount.mockReturnValue([[entry as Entry], 1]);
+    repository.findAndCount.mockReturnValue([[entry as Entry], 1, 0]);
     expect(await service.findAll({} as EntriesFindArgs)).toEqual([
       [entry as Entry],
       1,
+      0,
     ]);
   });
 

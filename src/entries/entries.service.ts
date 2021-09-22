@@ -22,7 +22,7 @@ export class EntriesService {
   async findAll(
     args: EntriesFindArgs,
     ...relations: string[]
-  ): Promise<[Entry[], number]> {
+  ): Promise<[Entry[], number, number]> {
     const filter = {
       where: {},
       skip: args.skip,
@@ -38,7 +38,17 @@ export class EntriesService {
     if (args.assignmentId) {
       Object.assign(filter.where, { assignmentId: Number(args.assignmentId) });
     }
-    return await this.repository.findAndCount(filter);
+
+    let totalTime = 0;
+    const [result, total] = await this.repository.findAndCount(filter);
+    if (total > 0) {
+      for (let entry of result) {
+        if (entry.startTime && entry.finishTime) {
+          totalTime += Number(entry.finishTime) - Number(entry.startTime);
+        }
+      }
+    }
+    return [result, total, totalTime];
   }
 
   async create(
