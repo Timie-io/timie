@@ -84,7 +84,7 @@ export class EntriesResolver {
       throw new BadRequestException('assignment not found');
     }
     const entry = await this.entriesService.create(entryData, user, assignment);
-    pubSub.publish('entryAdded', entry);
+    pubSub.publish('entryAdded', { entryAdded: entry });
     return entry;
   }
 
@@ -110,7 +110,7 @@ export class EntriesResolver {
     }
     const copy = { ...entry };
     await this.entriesService.remove(entry);
-    pubSub.publish('entryRemoved', copy);
+    pubSub.publish('entryRemoved', { entryRemoved: copy });
     return copy;
   }
 
