@@ -105,4 +105,13 @@ export class UsersResolver {
     );
     return entries;
   }
+
+  @ResolveField()
+  async comments(@Parent() user: User) {
+    const { comments } = await this.usersService.findOneById(
+      Number(user.id),
+      'comments',
+    );
+    return comments;
+  }
 }

@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Assignment } from '../../assignments/models/assignment.model';
+import { Comment } from '../../comments/model/comment.model';
 import { Project } from '../../projects/models/project.model';
 import { User } from '../../users/models/user.model';
 
@@ -37,4 +38,7 @@ export class Task {
 
   @Field((type) => [Assignment], { nullable: 'items' })
   assignments: Assignment[];
+
+  @Field((type) => [Comment], { nullable: 'items' })
+  comments: Comment[];
 }

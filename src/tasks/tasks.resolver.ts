@@ -91,6 +91,15 @@ export class TasksResolver {
     return assignments;
   }
 
+  @ResolveField()
+  async comments(@Parent() task: Task) {
+    const { comments } = await this.tasksService.findOneById(
+      Number(task.id),
+      'comments',
+    );
+    return comments;
+  }
+
   @Query((returns) => Task, { complexity: -20 })
   @UseGuards(GqlAuthGuard)
   async task(@Args('id', { type: () => ID }) id: string) {

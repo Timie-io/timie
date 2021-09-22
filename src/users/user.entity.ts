@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
+import { Comment } from '../comments/comment.entity';
 import { Project } from '../projects/project.entity';
 import { Task } from '../tasks/task.entity';
 import { Team } from '../teams/team.entity';
@@ -54,4 +55,7 @@ export class User {
 
   @OneToMany(() => Entry, (entry) => entry.user)
   entries: Entry[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 }

@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
 import { ComplexityPlugin } from './common/plugins/complexity.plugin';
 import { EntriesModule } from './entries/entries.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -12,6 +13,8 @@ import { StatusModule } from './status/status.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
+
+// TODO: Test Auth for all the resolvers E2E
 
 @Module({
   imports: [
@@ -76,6 +79,7 @@ import { UsersModule } from './users/users.module';
     AssignmentsModule,
     StatusModule,
     EntriesModule,
+    CommentsModule,
   ],
   providers: [ComplexityPlugin],
 })

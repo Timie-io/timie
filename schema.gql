@@ -36,6 +36,15 @@ type Task {
   creator: User!
   followers: [User]!
   assignments: [Assignment]!
+  comments: [Comment]!
+}
+
+type Comment {
+  id: ID!
+  task: Task!
+  user: User!
+  creationDate: Date!
+  body: String!
 }
 
 type User {
@@ -50,6 +59,7 @@ type User {
   myTasks: [Task!]
   assignments: [Assignment!]
   entries: [Entry!]
+  comments: [Comment]!
 }
 
 type Entry {
@@ -101,6 +111,11 @@ type AssignmentsResult {
   total: Int!
 }
 
+type CommentsResult {
+  result: [Comment!]!
+  total: Int!
+}
+
 type EntriesResult {
   result: [Entry!]!
   total: Int!
@@ -125,6 +140,8 @@ type Query {
   statuses: [Status!]!
   entry(id: ID!): ID!
   entries(skip: Int = 0, take: Int = 25, note: String, userId: ID, assignmentId: ID): EntriesResult!
+  comment(id: ID!): Comment!
+  comments(skip: Int = 0, take: Int = 25, taskId: ID, userId: ID): CommentsResult!
 }
 
 type Mutation {
@@ -152,6 +169,9 @@ type Mutation {
   removeEntry(id: ID!): Entry!
   startEntry(id: ID!): Entry!
   stopEntry(id: ID!): Entry!
+  createComment(taskId: ID!, data: NewCommentInput!): Comment!
+  updateComment(data: UpdateCommentInput!, id: ID!): Comment!
+  removeComment(id: ID!): Comment!
 }
 
 input NewTeamInput {
@@ -231,6 +251,14 @@ input UpdateEntryInput {
   note: String
 }
 
+input NewCommentInput {
+  body: String!
+}
+
+input UpdateCommentInput {
+  body: String
+}
+
 type Subscription {
   teamAdded(input: TeamAddedInput): Team!
   teamRemoved(input: TeamAddedInput): Team!
@@ -244,6 +272,8 @@ type Subscription {
   entryRemoved(input: EntryChangedInput): Entry!
   entryStarted(input: EntryChangedInput): Entry!
   entryStopped(input: EntryChangedInput): Entry!
+  commentAdded(input: CommentAddedInput): Comment!
+  commentRemoved(input: CommentAddedInput): Comment!
 }
 
 input TeamAddedInput {
@@ -268,4 +298,8 @@ input AssignmentAddedInput {
 input EntryChangedInput {
   userId: ID
   assignmentId: ID
+}
+
+input CommentAddedInput {
+  taskId: ID
 }

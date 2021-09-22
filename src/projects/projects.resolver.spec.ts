@@ -43,6 +43,7 @@ describe('ProjectsResolver', () => {
       myTasks: [],
       assignments: [],
       entries: [],
+      comments: [],
     } as UserModel;
 
     team = {

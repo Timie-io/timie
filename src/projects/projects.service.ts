@@ -40,10 +40,10 @@ export class ProjectsService {
       Object.assign(filter.where, { active: args.active });
     }
     if (args.ownerId) {
-      Object.assign(filter.where, { ownerId: args.ownerId });
+      Object.assign(filter.where, { ownerId: Number(args.ownerId) });
     }
     if (args.teamId) {
-      Object.assign(filter.where, { teamId: args.teamId });
+      Object.assign(filter.where, { teamId: Number(args.teamId) });
     }
     return await this.repository.findAndCount(filter);
   }

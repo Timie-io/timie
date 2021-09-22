@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
+import { Comment } from '../comments/comment.entity';
 import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
 
@@ -49,4 +50,7 @@ export class Task {
 
   @OneToMany(() => Assignment, (assignment) => assignment.task)
   assignments: Assignment[];
+
+  @OneToMany(() => Comment, (comment) => comment.task)
+  comments: Comment[];
 }
