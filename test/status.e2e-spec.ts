@@ -10,7 +10,7 @@ describe('Status E2E Tests', () => {
   let app: INestApplication;
   let access_token: string;
   const email = faker.internet.email();
-  const password = '1234';
+  const password = '12345678';
   const name = faker.name.findName();
 
   const statusCode = 'P';

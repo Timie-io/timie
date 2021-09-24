@@ -1,6 +1,7 @@
 import { RedisModule } from '@liaoliaots/nestjs-redis';
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AssignmentsModule } from './assignments/assignments.module';
@@ -81,6 +82,12 @@ import { UsersModule } from './users/users.module';
     EntriesModule,
     CommentsModule,
   ],
-  providers: [ComplexityPlugin],
+  providers: [
+    ComplexityPlugin,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe(),
+    },
+  ],
 })
 export class AppModule {}

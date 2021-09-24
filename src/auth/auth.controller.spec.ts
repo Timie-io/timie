@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '../users/user.entity';
 import { AuthController } from './auth.controller';
@@ -12,6 +13,7 @@ interface TokenResponse {
 describe('AuthController', () => {
   let controller: AuthController;
   let authService: Partial<AuthService>;
+  let configService: Partial<ConfigService>;
   let user: Partial<User>;
   let tokenResponse: TokenResponse;
 
@@ -36,10 +38,18 @@ describe('AuthController', () => {
         return user as User;
       },
     };
+    configService = {
+      get(key: string) {
+        return '0';
+      },
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [{ provide: AuthService, useValue: authService }],
+      providers: [
+        { provide: AuthService, useValue: authService },
+        { provide: ConfigService, useValue: configService },
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);

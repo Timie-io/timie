@@ -88,4 +88,16 @@ export class AuthService {
   async logout(user: User) {
     return await this.redis.del(`login_${user.id}`);
   }
+
+  async allowSignup(email: string, time: number) {
+    return await this.redis.set(`allow_${email}`, '1', 'EX', time);
+  }
+
+  async signupAllowed(email: string) {
+    const allowed = await this.redis.get(`allow_${email}`);
+    if (allowed === '1') {
+      return true;
+    }
+    return false;
+  }
 }

@@ -7,7 +7,7 @@ import { AppModule } from './../src/app.module';
 describe('Authentication System', () => {
   let app: INestApplication;
   const email = faker.internet.email();
-  const password = '1234';
+  const password = '12345678';
   const name = faker.name.findName();
 
   let access_token: string;
