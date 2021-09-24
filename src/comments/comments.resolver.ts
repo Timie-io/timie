@@ -150,7 +150,7 @@ export class CommentsResolver {
   @Subscription((returns) => Comment, {
     filter: (payload, variables) => {
       if (variables.input && variables.input.taskId) {
-        if (payload.commentAdded.taskId !== Number(variables.input.taskId)) {
+        if (payload.commentRemoved.taskId !== Number(variables.input.taskId)) {
           return false;
         }
       }
