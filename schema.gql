@@ -145,6 +145,8 @@ type Query {
 }
 
 type Mutation {
+  updateUserPassword(data: UpdatePasswordInput!): User!
+  removeUser: User!
   createTeam(data: NewTeamInput!): Team!
   removeTeam(id: ID!): Team!
   updateTeam(data: UpdateTeamInput!, id: ID!): Team!
@@ -172,6 +174,10 @@ type Mutation {
   createComment(taskId: ID!, data: NewCommentInput!): Comment!
   updateComment(data: UpdateCommentInput!, id: ID!): Comment!
   removeComment(id: ID!): Comment!
+}
+
+input UpdatePasswordInput {
+  password: String!
 }
 
 input NewTeamInput {
