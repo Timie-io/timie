@@ -135,7 +135,7 @@ type Query {
   task(id: ID!): Task!
   tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean, followerIds: [ID!]): TasksResult!
   assignment(id: ID!): Assignment!
-  assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID): AssignmentsResult!
+  assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, statusCode: ID): AssignmentsResult!
   status(code: ID!): Status!
   statuses: [Status!]!
   entry(id: ID!): ID!

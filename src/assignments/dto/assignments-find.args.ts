@@ -8,4 +8,7 @@ export class AssignmentsFindArgs extends FindArgs {
 
   @Field((type) => ID, { nullable: true })
   taskId: string;
+
+  @Field((type) => ID, { nullable: true })
+  statusCode: string;
 }

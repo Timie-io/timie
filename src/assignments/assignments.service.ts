@@ -33,6 +33,11 @@ export class AssignmentsService {
         taskId: args.taskId,
       });
     }
+    if (args.statusCode) {
+      query = query.andWhere('assignment.statusCode = :statusCode', {
+        statusCode: args.statusCode,
+      });
+    }
     if (args.skip) {
       query = query.skip(args.skip);
     }
