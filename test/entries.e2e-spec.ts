@@ -20,7 +20,7 @@ describe('Entries E2E Tests', () => {
   let assignmentId: string;
   let entryId: string;
 
-  const projectName = faker.name.title();
+  const projectName = faker.name.title().substring(0, 20);
   const projectDesc = 'This is my Awesome project';
 
   const taskTitle = 'Amazing Task'; // could be duplicated
@@ -171,6 +171,30 @@ describe('Entries E2E Tests', () => {
     assignmentId = createAssignment.id; // IMPORTANT
   });
 
+  it('create an entry should be unauthorized', async () => {
+    const createEntryMutation = gql`
+      mutation createEntry($data: NewEntryInput!) {
+        createEntry(data: $data) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'createEntry',
+        query: print(createEntryMutation),
+        variables: {
+          data: {
+            userId: userId,
+            assignmentId: assignmentId,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('create an entry', async () => {
     const createEntryMutation = gql`
       mutation createEntry($data: NewEntryInput!) {
@@ -216,6 +240,28 @@ describe('Entries E2E Tests', () => {
     entryId = createEntry.id;
   });
 
+  it('start the timer should be unauthorized', async () => {
+    const startEntryMutation = gql`
+      mutation startEntry($id: ID!) {
+        startEntry(id: $id) {
+          startTime
+          finishTime
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'startEntry',
+        query: print(startEntryMutation),
+        variables: {
+          id: entryId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('start the timer for a entry', async () => {
     const startEntryMutation = gql`
       mutation startEntry($id: ID!) {
@@ -244,6 +290,28 @@ describe('Entries E2E Tests', () => {
     expect(startEntry.startTime).not.toBeNull();
     expect(startEntry.finishTime).toBeDefined();
     expect(startEntry.finishTime).toBeNull();
+  });
+
+  it('stop the timer should be unauthorized', async () => {
+    const stopEntryMutation = gql`
+      mutation stopEntry($id: ID!) {
+        stopEntry(id: $id) {
+          startTime
+          finishTime
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'stopEntry',
+        query: print(stopEntryMutation),
+        variables: {
+          id: entryId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('stop the timer for a entry', async () => {
@@ -276,6 +344,32 @@ describe('Entries E2E Tests', () => {
     expect(stopEntry.finishTime).not.toBeNull();
   });
 
+  it('update an entry should be unauthorized', async () => {
+    const updateEntryMutation = gql`
+      mutation updateEntry($id: ID!, $data: UpdateEntryInput!) {
+        updateEntry(id: $id, data: $data) {
+          startTime
+          finishTime
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'updateEntry',
+        query: print(updateEntryMutation),
+        variables: {
+          id: entryId,
+          data: {
+            startTime: new Date(),
+            finishTime: null,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('update an entry', async () => {
     const updateEntryMutation = gql`
       mutation updateEntry($id: ID!, $data: UpdateEntryInput!) {
@@ -306,6 +400,27 @@ describe('Entries E2E Tests', () => {
     expect(updateEntry).toBeDefined();
     expect(updateEntry.startTime).not.toBeNull();
     expect(updateEntry.finishTime).toBeNull();
+  });
+
+  it('remove an entry should be unauthorized', async () => {
+    const removeEntryMutation = gql`
+      mutation removeEntry($id: ID!) {
+        removeEntry(id: $id) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeEntry',
+        query: print(removeEntryMutation),
+        variables: {
+          id: entryId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('remove an entry', async () => {

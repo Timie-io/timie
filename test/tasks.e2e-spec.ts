@@ -17,7 +17,7 @@ describe('Tasks E2E Tests', () => {
   let projectId: string;
   let taskId: string;
 
-  const projectName = faker.name.title();
+  const projectName = faker.name.title().substring(0, 20) + ' (tasks)';
   const projectDesc = 'This is my Awesome project';
 
   const taskTitle = 'Amazing Task'; // could be duplicated
@@ -70,6 +70,31 @@ describe('Tasks E2E Tests', () => {
     } = res.body;
     userId = createProject.owner.id; // IMPORTANT
     projectId = createProject.id; // IMPORTANT
+  });
+
+  it('create a task should be unauthorized', async () => {
+    const createTaskMutation = gql`
+      mutation createTask($data: NewTaskInput!) {
+        createTask(data: $data) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'createTask',
+        query: print(createTaskMutation),
+        variables: {
+          data: {
+            title: taskTitle,
+            description: taskDesc,
+            projectId: projectId,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('create a task', async () => {
@@ -130,6 +155,27 @@ describe('Tasks E2E Tests', () => {
     taskId = createTask.id; // IMPORTANT
   });
 
+  it('get a task should be unauthorized', async () => {
+    const getTaskQuery = gql`
+      query getTask($id: ID!) {
+        task(id: $id) {
+          title
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getTask',
+        query: print(getTaskQuery),
+        variables: {
+          id: taskId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('get a task by ID', async () => {
     const getTaskQuery = gql`
       query getTask($id: ID!) {
@@ -156,6 +202,27 @@ describe('Tasks E2E Tests', () => {
     expect(task).toBeDefined();
     expect(task.title).toEqual(taskTitle);
     expect(task.description).toEqual(taskDesc);
+  });
+
+  it('get a list of tasks should be unauthorized', async () => {
+    const getAllTasksQuery = gql`
+      query getProjectTasks($projectId: ID) {
+        tasks(projectId: $projectId) {
+          total
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getProjectTasks',
+        query: print(getAllTasksQuery),
+        variables: {
+          projectId: projectId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('get a list of tasks', async () => {
@@ -195,6 +262,31 @@ describe('Tasks E2E Tests', () => {
     expect(tasks.result[0].description).toEqual(taskDesc);
   });
 
+  it('update a task should be unauthorized', async () => {
+    const updateTaskMutation = gql`
+      mutation updateTask($id: ID!, $data: UpdateTaskInput!) {
+        updateTask(id: $id, data: $data) {
+          title
+        }
+      }
+    `;
+    const newDesc = 'The task description has been updated';
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'updateTask',
+        query: print(updateTaskMutation),
+        variables: {
+          id: taskId,
+          data: {
+            description: newDesc,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('update a task', async () => {
     const updateTaskMutation = gql`
       mutation updateTask($id: ID!, $data: UpdateTaskInput!) {
@@ -232,6 +324,28 @@ describe('Tasks E2E Tests', () => {
     taskDesc = newDesc; // IMPORTANT
   });
 
+  it('add a task follower should be unauthorized', async () => {
+    const addFollowerMutation = gql`
+      mutation addTaskFollower($id: ID!, $userId: ID!) {
+        addTaskFollower(id: $id, userId: $userId) {
+          title
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'addTaskFollower',
+        query: print(addFollowerMutation),
+        variables: {
+          id: taskId,
+          userId: userId, // it should already be a follower... not very effective I know
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('add a task follower', async () => {
     const addFollowerMutation = gql`
       mutation addTaskFollower($id: ID!, $userId: ID!) {
@@ -266,6 +380,28 @@ describe('Tasks E2E Tests', () => {
     expect(addTaskFollower.followers).toHaveLength(1);
   });
 
+  it('remove a task follower should be unauthorized', async () => {
+    const removeFollowerMutation = gql`
+      mutation removeTaskFollower($id: ID!, $userId: ID!) {
+        removeTaskFollower(id: $id, userId: $userId) {
+          title
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeTaskFollower',
+        query: print(removeFollowerMutation),
+        variables: {
+          id: taskId,
+          userId: userId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('remove a task follower', async () => {
     const removeFollowerMutation = gql`
       mutation removeTaskFollower($id: ID!, $userId: ID!) {
@@ -298,6 +434,27 @@ describe('Tasks E2E Tests', () => {
     expect(removeTaskFollower.description).toEqual(taskDesc);
     expect(removeTaskFollower.followers).toBeDefined();
     expect(removeTaskFollower.followers).toHaveLength(0);
+  });
+
+  it('remove a task should be unauthorized', async () => {
+    const removeTaskMutation = gql`
+      mutation removeTask($id: ID!) {
+        removeTask(id: $id) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeTask',
+        query: print(removeTaskMutation),
+        variables: {
+          id: taskId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('remove a task', async () => {

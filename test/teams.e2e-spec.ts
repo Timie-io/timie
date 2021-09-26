@@ -15,7 +15,7 @@ describe('Teams E2E Tests', () => {
 
   let userId: string;
   let teamId: string;
-  const teamName = faker.name.title();
+  const teamName = faker.name.title().substring(0, 20);
   const teamDesc = 'This is my Awesome team, not so awesome though';
 
   beforeEach(async () => {
@@ -34,6 +34,30 @@ describe('Teams E2E Tests', () => {
       .expect(201);
     access_token = res.body.access_token;
     expect(access_token).toBeDefined();
+  });
+
+  it('create a team should be unauthorized', async () => {
+    const createTeamMutation = gql`
+      mutation createTeam($data: NewTeamInput!) {
+        createTeam(data: $data) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'createTeam',
+        query: print(createTeamMutation),
+        variables: {
+          data: {
+            name: teamName,
+            description: teamDesc,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('create a team', async () => {
@@ -80,6 +104,27 @@ describe('Teams E2E Tests', () => {
     teamId = createTeam.id; // IMPORTANT
   });
 
+  it('list all teams should be unauthorized', async () => {
+    const listTeamsQuery = gql`
+      query getAllTeams($ownerId: ID) {
+        teams(ownerId: $ownerId) {
+          total
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getAllTeams',
+        query: print(listTeamsQuery),
+        variables: {
+          ownerId: userId,
+        },
+      });
+    // expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('list all teams', async () => {
     const listTeamsQuery = gql`
       query getAllTeams($ownerId: ID) {
@@ -124,6 +169,27 @@ describe('Teams E2E Tests', () => {
     expect(teams.result[0].members[0].email).toEqual(email);
   });
 
+  it('get a team should be unauthorized', async () => {
+    const getTeamQuery = gql`
+      query getTeam($id: ID!) {
+        team(id: $id) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getTeam',
+        query: print(getTeamQuery),
+        variables: {
+          id: teamId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('get a team by id', async () => {
     const getTeamQuery = gql`
       query getTeam($id: ID!) {
@@ -159,6 +225,31 @@ describe('Teams E2E Tests', () => {
     expect(team.description).toEqual(teamDesc);
     expect(team.owner.email).toEqual(email);
     expect(team.members[0].email).toEqual(email);
+  });
+
+  it('update a team should be unauthorized', async () => {
+    const updateTeamMutation = gql`
+      mutation updateTeam($id: ID!, $data: UpdateTeamInput!) {
+        updateTeam(id: $id, data: $data) {
+          id
+        }
+      }
+    `;
+    const newTeamDesc = teamDesc + ' (UPDATED)';
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'updateTeam',
+        query: print(updateTeamMutation),
+        variables: {
+          id: teamId,
+          data: {
+            description: newTeamDesc,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('update a team owned by me', async () => {
@@ -203,6 +294,28 @@ describe('Teams E2E Tests', () => {
     expect(updateTeam.members[0].email).toEqual(email);
   });
 
+  it('add a new team member should be unauthorized', async () => {
+    const addTeamMemberMutation = gql`
+      mutation addTeamMember($userId: ID!, $teamId: ID!) {
+        addTeamMember(userId: $userId, teamId: $teamId) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'addTeamMember',
+        query: print(addTeamMemberMutation),
+        variables: {
+          userId: userId, // actualy, this user is already a member... :)
+          teamId: teamId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('add a new team member', async () => {
     const addTeamMemberMutation = gql`
       mutation addTeamMember($userId: ID!, $teamId: ID!) {
@@ -243,6 +356,28 @@ describe('Teams E2E Tests', () => {
     expect(addTeamMember.members[0].id).toEqual(userId);
   });
 
+  it('remove a team member should be unauthorized', async () => {
+    const removeTeamMemberMutation = gql`
+      mutation removeTeamMember($userId: ID!, $teamId: ID!) {
+        removeTeamMember(userId: $userId, teamId: $teamId) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeTeamMember',
+        query: print(removeTeamMemberMutation),
+        variables: {
+          userId: userId, // actualy, this user is already a member... :)
+          teamId: teamId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('remove a team member', async () => {
     const removeTeamMemberMutation = gql`
       mutation removeTeamMember($userId: ID!, $teamId: ID!) {
@@ -280,6 +415,27 @@ describe('Teams E2E Tests', () => {
     expect(removeTeamMember.id).toEqual(teamId);
     expect(removeTeamMember.name).toEqual(teamName);
     expect(removeTeamMember.members).toHaveLength(0);
+  });
+
+  it('remove a team should be unauthorized', async () => {
+    const removeTeamMutation = gql`
+      mutation removeTeam($id: ID!) {
+        removeTeam(id: $id) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeTeam',
+        query: print(removeTeamMutation),
+        variables: {
+          id: teamId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('remove a team owned by me', async () => {

@@ -18,7 +18,7 @@ describe('Comments E2E Tests', () => {
   let taskId: string;
   let commentId: string;
 
-  const projectName = faker.name.title();
+  const projectName = faker.name.title().substring(0, 20);
   const projectDesc = 'This is my Awesome project';
 
   const taskTitle = 'Amazing Task'; // could be duplicated
@@ -106,6 +106,30 @@ describe('Comments E2E Tests', () => {
     taskId = createTask.id; // IMPORTANT
   });
 
+  it('create a comment should be unauthorized', async () => {
+    const createCommentMutation = gql`
+      mutation createComment($taskId: ID!, $data: NewCommentInput!) {
+        createComment(taskId: $taskId, data: $data) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'createComment',
+        query: print(createCommentMutation),
+        variables: {
+          taskId: taskId,
+          data: {
+            body: commentBody,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('create a comment', async () => {
     const createCommentMutation = gql`
       mutation createComment($taskId: ID!, $data: NewCommentInput!) {
@@ -148,6 +172,27 @@ describe('Comments E2E Tests', () => {
     commentId = createComment.id; // IMPORTANT
   });
 
+  it('get a comment should be unauthorized', async () => {
+    const getCommentQuery = gql`
+      query getComment($id: ID!) {
+        comment(id: $id) {
+          body
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getComment',
+        query: print(getCommentQuery),
+        variables: {
+          id: commentId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('get a comment by ID', async () => {
     const getCommentQuery = gql`
       query getComment($id: ID!) {
@@ -172,6 +217,27 @@ describe('Comments E2E Tests', () => {
     } = res.body;
     expect(comment).toBeDefined();
     expect(comment.body).toEqual(commentBody);
+  });
+
+  it('get all comments should be unauthorized', async () => {
+    const getAllCommentsQuery = gql`
+      query getAllComments($taskId: ID!) {
+        comments(taskId: $taskId) {
+          total
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getAllComments',
+        query: print(getAllCommentsQuery),
+        variables: {
+          taskId: taskId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('get all comments', async () => {
@@ -205,6 +271,31 @@ describe('Comments E2E Tests', () => {
     expect(comments.result[0].id).toEqual(commentId);
   });
 
+  it('update a comment should be unauthorized', async () => {
+    const updateCommentMutation = gql`
+      mutation updateComment($id: ID!, $data: UpdateCommentInput!) {
+        updateComment(id: $id, data: $data) {
+          body
+        }
+      }
+    `;
+    const newBody = 'This comment has been updated';
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'updateComment',
+        query: print(updateCommentMutation),
+        variables: {
+          id: commentId,
+          data: {
+            body: newBody,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('update a comment', async () => {
     const updateCommentMutation = gql`
       mutation updateComment($id: ID!, $data: UpdateCommentInput!) {
@@ -235,6 +326,27 @@ describe('Comments E2E Tests', () => {
     expect(updateComment.body).toEqual(newBody);
 
     commentBody = newBody;
+  });
+
+  it('remove a comment shuld be unauthorized', async () => {
+    const removeCommentMutation = gql`
+      mutation removeComment($id: ID!) {
+        removeComment(id: $id) {
+          body
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeComment',
+        query: print(removeCommentMutation),
+        variables: {
+          id: commentId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('remove a comment', async () => {

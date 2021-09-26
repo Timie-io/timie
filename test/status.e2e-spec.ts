@@ -34,6 +34,31 @@ describe('Status E2E Tests', () => {
     expect(access_token).toBeDefined();
   });
 
+  it('create a status should be unauthorized', async () => {
+    const createStatusMutation = gql`
+      mutation createStatus($data: NewStatusInput!) {
+        createStatus(data: $data) {
+          code
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'createStatus',
+        query: print(createStatusMutation),
+        variables: {
+          data: {
+            code: statusCode,
+            label: statusLabel,
+            order: statusOrder,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('create a status', async () => {
     const createStatusMutation = gql`
       mutation createStatus($data: NewStatusInput!) {
@@ -67,6 +92,28 @@ describe('Status E2E Tests', () => {
     expect(createStatus.order).toEqual(statusOrder);
   });
 
+  it('find a status should be unauthorized', async () => {
+    const getStatusQuery = gql`
+      query getStatus($code: ID!) {
+        status(code: $code) {
+          label
+          order
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getStatus',
+        query: print(getStatusQuery),
+        variables: {
+          code: statusCode,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('find a status by code', async () => {
     const getStatusQuery = gql`
       query getStatus($code: ID!) {
@@ -94,6 +141,26 @@ describe('Status E2E Tests', () => {
     expect(status.order).toEqual(statusOrder);
   });
 
+  it('find all status should be unauthorized', async () => {
+    const getAllStatusQuery = gql`
+      {
+        statuses {
+          code
+          label
+          order
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: null,
+        query: print(getAllStatusQuery),
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('find all status', async () => {
     const getAllStatusQuery = gql`
       {
@@ -117,6 +184,31 @@ describe('Status E2E Tests', () => {
     } = res.body;
     expect(statuses).toBeDefined();
     expect(statuses.length).toBeGreaterThan(0);
+  });
+
+  it('update a status should be unauthorized', async () => {
+    const updateStatusMutation = gql`
+      mutation updateStatus($code: ID!, $data: UpdateStatusInput!) {
+        updateStatus(code: $code, data: $data) {
+          label
+        }
+      }
+    `;
+    statusLabel = 'In Progress';
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'updateStatus',
+        query: print(updateStatusMutation),
+        variables: {
+          code: statusCode,
+          data: {
+            label: statusLabel,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('update status', async () => {
@@ -147,6 +239,29 @@ describe('Status E2E Tests', () => {
     } = res.body;
     expect(updateStatus).toBeDefined();
     expect(updateStatus.label).toEqual(statusLabel);
+  });
+
+  it('remove a status should be unauthorized', async () => {
+    const removeStatusMutation = gql`
+      mutation removeStatus($code: ID!) {
+        removeStatus(code: $code) {
+          code
+          label
+          order
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeStatus',
+        query: print(removeStatusMutation),
+        variables: {
+          code: statusCode,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('remove status', async () => {

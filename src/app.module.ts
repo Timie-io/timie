@@ -15,8 +15,6 @@ import { TasksModule } from './tasks/tasks.module';
 import { TeamsModule } from './teams/teams.module';
 import { UsersModule } from './users/users.module';
 
-// TODO: Test Auth for all the resolvers E2E
-
 @Module({
   imports: [
     ConfigModule.forRoot({

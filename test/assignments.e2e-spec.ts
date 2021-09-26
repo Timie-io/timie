@@ -19,7 +19,7 @@ describe('Assignments E2E Tests', () => {
   let statusCode = 'O';
   let assignmentId: string;
 
-  const projectName = faker.name.title();
+  const projectName = faker.name.title().substring(0, 20);
   const projectDesc = 'This is my Awesome project';
 
   const taskTitle = 'Amazing Task'; // could be duplicated
@@ -137,6 +137,31 @@ describe('Assignments E2E Tests', () => {
     expect(createStatus.code).toEqual(statusCode);
   });
 
+  it('create an assignment is unauthorized', async () => {
+    const createAssignmentMutation = gql`
+      mutation createAssignment($data: NewAssignmentInput!) {
+        createAssignment(data: $data) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'createAssignment',
+        query: print(createAssignmentMutation),
+        variables: {
+          data: {
+            note: assignmentNote,
+            deadline: new Date(2021, 9, 21, 19).toISOString(),
+            taskId: taskId,
+            userId: userId,
+            statusCode: statusCode,
+          },
+        },
+      });
+  });
+
   it('create an assignment', async () => {
     const createAssignmentMutation = gql`
       mutation createAssignment($data: NewAssignmentInput!) {
@@ -187,6 +212,27 @@ describe('Assignments E2E Tests', () => {
     assignmentId = createAssignment.id; // IMPORTANT
   });
 
+  it('get an assignment is unauthorized', async () => {
+    const getAssignmentQuery = gql`
+      query getAssignment($id: ID!) {
+        assignment(id: $id) {
+          note
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getAssignment',
+        query: print(getAssignmentQuery),
+        variables: {
+          id: assignmentId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('get an assignment by ID', async () => {
     const getAssignmentQuery = gql`
       query getAssignment($id: ID!) {
@@ -211,6 +257,27 @@ describe('Assignments E2E Tests', () => {
     } = res.body;
     expect(assignment).toBeDefined();
     expect(assignment.note).toEqual(assignmentNote);
+  });
+
+  it('get all assignments is unauthorized', async () => {
+    const getAllAssignmentsQuery = gql`
+      query getAllAssignments($taskId: ID!) {
+        assignments(taskId: $taskId) {
+          total
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getAllAssignments',
+        query: print(getAllAssignmentsQuery),
+        variables: {
+          taskId: taskId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('get all assignments', async () => {
@@ -244,6 +311,31 @@ describe('Assignments E2E Tests', () => {
     expect(assignments.result[0].id).toEqual(assignmentId);
   });
 
+  it('update an assignment is unauthorized', async () => {
+    const updateAssignmentMutation = gql`
+      mutation updateAssignment($id: ID!, $data: UpdateAssignmentInput!) {
+        updateAssignment(id: $id, data: $data) {
+          note
+        }
+      }
+    `;
+    const newNote = 'This note has been updated';
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'updateAssignment',
+        query: print(updateAssignmentMutation),
+        variables: {
+          id: assignmentId,
+          data: {
+            note: newNote,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('update an assignment', async () => {
     const updateAssignmentMutation = gql`
       mutation updateAssignment($id: ID!, $data: UpdateAssignmentInput!) {
@@ -274,6 +366,27 @@ describe('Assignments E2E Tests', () => {
     expect(updateAssignment.note).toEqual(newNote);
 
     assignmentNote = newNote;
+  });
+
+  it('remove an assignment is unauthorized', async () => {
+    const removeAssignmentMutation = gql`
+      mutation removeAssignment($id: ID!) {
+        removeAssignment(id: $id) {
+          note
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeAssignment',
+        query: print(removeAssignmentMutation),
+        variables: {
+          id: assignmentId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('remove an assignment', async () => {

@@ -9,6 +9,7 @@ import { AppModule } from './../src/app.module';
 describe('Users E2E Tests', () => {
   let app: INestApplication;
   let access_token: string;
+  let userId = '';
   const email = faker.internet.email();
   const password = '12345678';
   const name = faker.name.findName();
@@ -70,6 +71,22 @@ describe('Users E2E Tests', () => {
     expect(loggedUser.id).toBeDefined();
     expect(loggedUser.email).toEqual(email);
     expect(loggedUser.name).toEqual(name);
+
+    userId = loggedUser.id;
+  });
+
+  it('query a user by id should be unauthorized', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getUserById',
+        query: print(getUserByIdQuery),
+        variables: {
+          id: '1',
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('query a user by id', async () => {
@@ -80,7 +97,7 @@ describe('Users E2E Tests', () => {
         operationName: 'getUserById',
         query: print(getUserByIdQuery),
         variables: {
-          id: '1',
+          id: userId,
         },
       });
     const {
@@ -88,6 +105,132 @@ describe('Users E2E Tests', () => {
     } = res.body;
     expect(user).toBeDefined();
     expect(typeof user.email).toBe('string');
-    expect(user.id).toEqual('1');
+    expect(user.id).toEqual(userId);
+  });
+
+  it('list all users should be unauthorized', async () => {
+    const getAllUsersQuery = gql`
+      query GetAllUsers {
+        users {
+          id
+          name
+          email
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'GetAllUsers',
+        query: print(getAllUsersQuery),
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
+  it('list all users', async () => {
+    const getAllUsersQuery = gql`
+      query GetAllUsers {
+        users {
+          id
+          name
+          email
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send({
+        operationName: 'GetAllUsers',
+        query: print(getAllUsersQuery),
+      });
+    expect(res.body.data).toBeDefined();
+    const {
+      data: { users },
+    } = res.body;
+    expect(users.length).toBeGreaterThan(0);
+  });
+
+  it('update the user password should be unauthorized', async () => {
+    const updateUserPasswordMutation = gql`
+      mutation updateUserPassword($data: UpdatePasswordInput!) {
+        updateUserPassword(data: $data) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'updateUserPassword',
+        query: print(updateUserPasswordMutation),
+        variables: {
+          data: { password: 'thispasswordischanged' },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
+  it('update the user password', async () => {
+    const updateUserPasswordMutation = gql`
+      mutation updateUserPassword($data: UpdatePasswordInput!) {
+        updateUserPassword(data: $data) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send({
+        operationName: 'updateUserPassword',
+        query: print(updateUserPasswordMutation),
+        variables: {
+          data: { password: 'thispasswordischanged' },
+        },
+      });
+    expect(res.body.data).toBeDefined();
+    const { updateUserPassword } = res.body.data;
+    expect(updateUserPassword.id).toEqual(userId);
+  });
+
+  it('remove the user should be unauthorized', async () => {
+    const removeUserMutation = gql`
+      mutation removeUser {
+        removeUser {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeUser',
+        query: print(removeUserMutation),
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
+  it('remove the user', async () => {
+    const removeUserMutation = gql`
+      mutation removeUser {
+        removeUser {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .set('Authorization', `Bearer ${access_token}`)
+      .send({
+        operationName: 'removeUser',
+        query: print(removeUserMutation),
+      });
+    expect(res.body.data).toBeDefined();
+    const { removeUser } = res.body.data;
+    expect(removeUser.id).toEqual(userId);
   });
 });

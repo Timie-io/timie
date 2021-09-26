@@ -105,7 +105,7 @@ export class UsersResolver {
   @Query((returns) => [User])
   @UseGuards(GqlAuthGuard)
   async users() {
-    return this.usersService.findAll();
+    return await this.usersService.findAll();
   }
 
   @Query((returns) => User)

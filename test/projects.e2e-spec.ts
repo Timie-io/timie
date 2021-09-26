@@ -15,7 +15,7 @@ describe('Projects E2E Tests', () => {
 
   let userId: string;
   let projectId: string;
-  const projectName = faker.name.title();
+  const projectName = faker.name.title().substring(0, 20);
   const projectDesc = 'This is my Awesome project';
 
   beforeEach(async () => {
@@ -33,6 +33,30 @@ describe('Projects E2E Tests', () => {
       .expect(201);
     access_token = res.body.access_token;
     expect(access_token).toBeDefined();
+  });
+
+  it('create a project should be unauthorized', async () => {
+    const createProjectMutation = gql`
+      mutation createProject($data: NewProjectInput!) {
+        createProject(data: $data) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'createProject',
+        query: print(createProjectMutation),
+        variables: {
+          data: {
+            name: projectName,
+            description: projectDesc,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('create a project', async () => {
@@ -75,6 +99,27 @@ describe('Projects E2E Tests', () => {
     projectId = createProject.id; // IMPORTANT
   });
 
+  it('get a project should be unauthorized', async () => {
+    const getProjectQuery = gql`
+      query getProject($id: ID!) {
+        project(id: $id) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'getProject',
+        query: print(getProjectQuery),
+        variables: {
+          id: projectId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('get a project by ID', async () => {
     const getProjectQuery = gql`
       query getProject($id: ID!) {
@@ -106,6 +151,24 @@ describe('Projects E2E Tests', () => {
     expect(project.name).toEqual(projectName);
     expect(project.description).toEqual(projectDesc);
     expect(project.owner.email).toEqual(email);
+  });
+
+  it('get all projects should be unauthorized', async () => {
+    const getAllProjectsQuery = gql`
+      {
+        projects {
+          total
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: null,
+        query: print(getAllProjectsQuery),
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('get all projects', async () => {
@@ -140,6 +203,24 @@ describe('Projects E2E Tests', () => {
     expect(total).toBeGreaterThan(0);
   });
 
+  it('get my projects should be unauthorized', async () => {
+    const getMyProjectsQuery = gql`
+      {
+        myProjects {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: null,
+        query: print(getMyProjectsQuery),
+      });
+    // expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
+  });
+
   it('get my projects', async () => {
     const getMyProjectsQuery = gql`
       {
@@ -169,6 +250,31 @@ describe('Projects E2E Tests', () => {
     expect(myProjects[0].name).toEqual(projectName);
     expect(myProjects[0].description).toEqual(projectDesc);
     expect(myProjects[0].owner.id).toEqual(userId);
+  });
+
+  it('update a project should be unauthorized', async () => {
+    const updateProjectMutation = gql`
+      mutation updateProject($id: ID!, $data: UpdateProjectInput!) {
+        updateProject(id: $id, data: $data) {
+          id
+        }
+      }
+    `;
+    const newDesc = 'This project description has been updated';
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'updateProject',
+        query: print(updateProjectMutation),
+        variables: {
+          id: projectId,
+          data: {
+            description: newDesc,
+          },
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('update project', async () => {
@@ -202,6 +308,27 @@ describe('Projects E2E Tests', () => {
     expect(updateProject.id).toEqual(projectId);
     expect(updateProject.name).toEqual(projectName);
     expect(updateProject.description).toEqual(newDesc);
+  });
+
+  it('remove a projects should be unauthorized', async () => {
+    const removeProjectMutation = gql`
+      mutation removeProject($id: ID!) {
+        removeProject(id: $id) {
+          id
+        }
+      }
+    `;
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        operationName: 'removeProject',
+        query: print(removeProjectMutation),
+        variables: {
+          id: projectId,
+        },
+      });
+    expect(res.body.data).toBeNull();
+    expect(res.body.errors[0].message).toEqual('Unauthorized');
   });
 
   it('remove a project', async () => {
