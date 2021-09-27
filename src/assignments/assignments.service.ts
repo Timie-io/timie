@@ -60,6 +60,9 @@ export class AssignmentsService {
     status: Status,
   ): Promise<Assignment> {
     const assignment = this.repository.create(data);
+    if (!assignment.note) {
+      assignment.note = task.title;
+    }
     assignment.task = task;
     assignment.user = user;
     assignment.creator = creator;
