@@ -37,4 +37,4 @@ lerna-debug.log*
 schema.gql
 
 ormconfig.json
-migration/
+src/migration/

@@ -52,10 +52,7 @@ import { UsersModule } from './users/users.module';
           url: config.get<string>('DB_URL'),
           entities: config.get<string>('ENTITIES').split(','),
           synchronize: config.get<boolean>('DB_SYNC'),
-          migrations: ['migration/*.ts'],
-          cli: {
-            migrationsDir: 'migration',
-          },
+          migrationsRun: false,
           keepConnectionAlive: true,
         };
       },
