@@ -1,5 +1,6 @@
 import { ArgsType, Field, ID } from '@nestjs/graphql';
 import { FindArgs } from '../../shared/dto/find.args';
+import { SortInput } from './../../shared/dto/sort-type.input';
 
 @ArgsType()
 export class TasksFindArgs extends FindArgs {
@@ -14,4 +15,7 @@ export class TasksFindArgs extends FindArgs {
 
   @Field((type) => [ID], { nullable: true })
   followerIds: string[];
+
+  @Field((type) => [SortInput], { nullable: 'itemsAndList' })
+  sortBy: SortInput[];
 }

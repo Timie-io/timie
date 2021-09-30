@@ -6,6 +6,13 @@ import { User } from '../users/user.entity';
 import { TasksFindArgs } from './dto/tasks-find.args';
 import { Task } from './task.entity';
 
+const sortableFields = {
+  title: 'task.title',
+  created: 'task.creationDate',
+  lastModified: 'task.lastModified',
+  priority: 'task.Priority',
+};
+
 @Injectable()
 export class TasksService {
   constructor(
@@ -52,9 +59,21 @@ export class TasksService {
     if (args.take) {
       query.take(args.take);
     }
-    query = query.orderBy('task.priority', 'DESC');
-    query = query.addOrderBy('task.creationDate', 'DESC');
-    query = query.addOrderBy('task.lastModified', 'DESC');
+
+    if (args.sortBy) {
+      for (let sort of args.sortBy) {
+        if (sort.columnName in sortableFields) {
+          query = query.addOrderBy(
+            sortableFields[sort.columnName],
+            sort.sortType,
+          );
+        }
+      }
+    } else {
+      query = query.orderBy('task.priority', 'DESC');
+      query = query.addOrderBy('task.creationDate', 'DESC');
+      query = query.addOrderBy('task.lastModified', 'DESC');
+    }
 
     const total = await query.getCount();
     const result = await query.getMany();

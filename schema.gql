@@ -133,7 +133,7 @@ type Query {
   projects(skip: Int = 0, take: Int = 25, name: String, active: Boolean, ownerId: ID, teamId: ID): ProjectsResult!
   myProjects: [Project!]
   task(id: ID!): Task!
-  tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean, followerIds: [ID!]): TasksResult!
+  tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean, followerIds: [ID!], sortBy: [SortInput]): TasksResult!
   assignment(id: ID!): Assignment!
   assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, statusCode: ID): AssignmentsResult!
   status(code: ID!): Status!
@@ -142,6 +142,11 @@ type Query {
   entries(skip: Int = 0, take: Int = 25, note: String, userId: ID, assignmentId: ID): EntriesResult!
   comment(id: ID!): Comment!
   comments(skip: Int = 0, take: Int = 25, taskId: ID, userId: ID): CommentsResult!
+}
+
+input SortInput {
+  columnName: String!
+  sortType: String = "ASC"
 }
 
 type Mutation {
