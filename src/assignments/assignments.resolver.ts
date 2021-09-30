@@ -224,12 +224,16 @@ export class AssignmentsResolver {
   @Subscription((returns) => Assignment, {
     filter: (payload, variables) => {
       if (variables.input && variables.input.taskId) {
-        if (payload.assignmentAdded.taskId !== Number(variables.input.taskId)) {
+        if (
+          payload.assignmentRemoved.taskId !== Number(variables.input.taskId)
+        ) {
           return false;
         }
       }
       if (variables.input && variables.input.userId) {
-        if (payload.assignmentAdded.userId !== Number(variables.input.userId)) {
+        if (
+          payload.assignmentRemoved.userId !== Number(variables.input.userId)
+        ) {
           return false;
         }
       }
