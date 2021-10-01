@@ -96,6 +96,19 @@ type TeamsResult {
   total: Int!
 }
 
+type TeamView {
+  id: ID!
+  name: String!
+  description: String!
+  ownerId: ID!
+  ownerName: String!
+}
+
+type TeamsViewResult {
+  result: [TeamView!]!
+  total: Int!
+}
+
 type ProjectsResult {
   result: [Project!]!
   total: Int!
@@ -128,6 +141,7 @@ type Query {
   loggedUser: User!
   team(id: ID!): Team!
   teams(skip: Int = 0, take: Int = 25, name: String, ownerId: ID): TeamsResult
+  teamsView(skip: Int = 0, take: Int = 25, search: String, ownerId: ID, sortBy: [SortInput]): TeamsViewResult!
   myTeams: [Team!]
   project(id: ID!): Project!
   projects(skip: Int = 0, take: Int = 25, name: String, active: Boolean, ownerId: ID, teamId: ID): ProjectsResult!

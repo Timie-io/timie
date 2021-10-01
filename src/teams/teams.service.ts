@@ -5,8 +5,8 @@ import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
 import { TeamsFindArgs } from './dto/teams-find.args';
 import { TeamsViewArgs } from './dto/teams-view.args';
+import { TeamView } from './team-view.entity';
 import { Team } from './team.entity';
-import { TeamView } from './team.view-entity';
 
 const sortableFields = {
   name: 'team.name',
@@ -28,13 +28,13 @@ export class TeamsService {
       query.where(
         new Brackets((qb) => {
           qb.where('team.name ilike :search', {
-            search: args.search,
+            search: `%${args.search}%`,
           });
           qb.orWhere('team.description ilike :search', {
-            search: args.search,
+            search: `%${args.search}%`,
           });
           qb.orWhere('team.ownerName ilike :search', {
-            search: args.search,
+            search: `%${args.search}%`,
           });
         }),
       );

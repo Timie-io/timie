@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { TeamView } from '../team.view-entity';
+import { TeamView } from './team-view.model';
 
 @ObjectType()
 export class TeamsViewResult {
