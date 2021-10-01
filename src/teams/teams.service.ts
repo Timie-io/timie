@@ -1,24 +1,68 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, ILike, Repository } from 'typeorm';
+import { Brackets, FindManyOptions, ILike, Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
 import { TeamsFindArgs } from './dto/teams-find.args';
 import { TeamsViewArgs } from './dto/teams-view.args';
-import { TeamView } from './models/team-view.model';
 import { Team } from './team.entity';
-import { TeamsView } from './teams.view-entity';
+import { TeamView } from './team.view-entity';
+
+const sortableFields = {
+  name: 'team.name',
+  description: 'team.description',
+  owner: 'team.ownerName',
+};
 
 @Injectable()
 export class TeamsService {
   constructor(
     @InjectRepository(Team) private readonly repository: Repository<Team>,
-    @InjectRepository(TeamsView)
-    private readonly teamsView: Repository<TeamsView>,
+    @InjectRepository(TeamView)
+    private readonly teamsView: Repository<TeamView>,
   ) {}
 
   async findView(args: TeamsViewArgs): Promise<[TeamView[], number]> {
-    return [[], 0];
+    let query = this.teamsView.createQueryBuilder('team');
+    if (args.search) {
+      query.where(
+        new Brackets((qb) => {
+          qb.where('team.name ilike :search', {
+            search: args.search,
+          });
+          qb.orWhere('team.description ilike :search', {
+            search: args.search,
+          });
+          qb.orWhere('team.ownerName ilike :search', {
+            search: args.search,
+          });
+        }),
+      );
+    }
+    if (args.ownerId) {
+      query.andWhere('team.ownerId = :ownerId', {
+        ownerId: args.ownerId,
+      });
+    }
+    if (args.skip) {
+      query.skip(args.skip);
+    }
+    if (args.take) {
+      query.take(args.take);
+    }
+    if (args.sortBy) {
+      for (let sort of args.sortBy) {
+        if (sort.columnName in sortableFields) {
+          query.addOrderBy(sortableFields[sort.columnName], sort.sortType);
+        }
+      }
+    } else {
+      query.orderBy('team.id', 'DESC');
+    }
+
+    const total = await query.getCount();
+    const result = await query.getMany();
+    return [result, total];
   }
 
   async findAll(

@@ -14,7 +14,7 @@ import { Team } from './team.entity';
       .from(Team, 'team')
       .leftJoin(User, 'user', 'user.id = team.ownerId'),
 })
-export class TeamsView {
+export class TeamView {
   @ViewColumn()
   id: number;
 

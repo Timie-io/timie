@@ -16,15 +16,17 @@ import {
 } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { User } from '../users/models/user.model';
 import { UsersService } from '../users/users.service';
+import { GqlAuthGuard } from './../auth/guards/gql-auth.guard';
 import { NewTeamInput } from './dto/new-team.input';
 import { TeamAddedInput } from './dto/team-added.input';
 import { TeamsFindArgs } from './dto/teams-find.args';
+import { TeamsViewArgs } from './dto/teams-view.args';
 import { UpdateTeamInput } from './dto/update-team.input';
 import { Team } from './models/team.model';
 import { TeamsResult } from './models/teams-result.model';
+import { TeamsViewResult } from './models/teams-view-result.model';
 import { TeamsService } from './teams.service';
 
 const pubSub = new PubSub();
@@ -80,6 +82,16 @@ export class TeamsResolver {
   @UseGuards(GqlAuthGuard)
   async teams(@Args() args: TeamsFindArgs) {
     const [result, total] = await this.teamsService.findAll(args);
+    return {
+      result,
+      total,
+    };
+  }
+
+  @Query((returns) => TeamsViewResult)
+  @UseGuards(GqlAuthGuard)
+  async teamsView(@Args() args: TeamsViewArgs) {
+    const [result, total] = await this.teamsService.findView(args);
     return {
       result,
       total,
