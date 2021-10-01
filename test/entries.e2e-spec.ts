@@ -186,7 +186,6 @@ describe('Entries E2E Tests', () => {
         query: print(createEntryMutation),
         variables: {
           data: {
-            userId: userId,
             assignmentId: assignmentId,
           },
         },
@@ -220,7 +219,6 @@ describe('Entries E2E Tests', () => {
         query: print(createEntryMutation),
         variables: {
           data: {
-            userId: userId,
             assignmentId: assignmentId,
           },
         },

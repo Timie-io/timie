@@ -247,7 +247,6 @@ input NewEntryInput {
   startTime: Date
   finishTime: Date
   note: String
-  userId: ID!
   assignmentId: ID
 }
 

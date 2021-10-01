@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Assignment } from '../assignments/assignment.entity';
 import { AssignmentsService } from '../assignments/assignments.service';
+import { User as UserModel } from '../users/models/user.model';
 import { User } from '../users/user.entity';
 import { UsersService } from './../users/users.service';
 import { EntriesFindArgs } from './dto/entries-find.args';
@@ -17,6 +18,7 @@ describe('EntriesResolver', () => {
   let assignmentsService: Partial<AssignmentsService>;
   let entry: Partial<Entry>;
   let user: Partial<User>;
+  let currentUser: Partial<UserModel>;
   let assignment: Partial<Assignment>;
 
   beforeEach(async () => {
@@ -26,13 +28,21 @@ describe('EntriesResolver', () => {
       email: 'user@mail.com',
     };
 
+    currentUser = {
+      id: '1',
+      name: 'User',
+      email: 'user@mail.com',
+    };
+
     assignment = {
       id: 1,
       note: 'Assignment',
+      userId: 1,
     };
 
     entry = {
       id: 1,
+      userId: 1,
       assignment: assignment as Assignment,
     };
 
@@ -113,7 +123,12 @@ describe('EntriesResolver', () => {
 
   it('should create one', async () => {
     const input = { assignmentId: '1' };
-    expect(await resolver.createEntry(input as NewEntryInput)).toEqual(entry);
+    expect(
+      await resolver.createEntry(
+        input as NewEntryInput,
+        currentUser as UserModel,
+      ),
+    ).toEqual(entry);
   });
 
   it('should update one', async () => {
@@ -124,7 +139,9 @@ describe('EntriesResolver', () => {
   });
 
   it('should remove one', async () => {
-    expect(await resolver.removeEntry('1')).toEqual(entry);
+    expect(await resolver.removeEntry('1', currentUser as UserModel)).toEqual(
+      entry,
+    );
   });
 
   it('should start the timer', async () => {

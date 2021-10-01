@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   NotFoundException,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -15,7 +16,9 @@ import {
 } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { AssignmentsService } from '../assignments/assignments.service';
+import { CurrentUser } from '../auth/current-user.decorator';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
+import { User } from '../users/models/user.model';
 import { UsersService } from './../users/users.service';
 import { EntriesFindArgs } from './dto/entries-find.args';
 import { EntryChangedInput } from './dto/entry-changed.input';
@@ -72,19 +75,28 @@ export class EntriesResolver {
 
   @Mutation((returns) => Entry)
   @UseGuards(GqlAuthGuard)
-  async createEntry(@Args('data') data: NewEntryInput) {
-    const { assignmentId, userId, ...entryData } = data;
-    const user = await this.usersService.findOneById(Number(userId));
-    if (!user) {
-      throw new BadRequestException('user not found');
-    }
+  async createEntry(
+    @Args('data') data: NewEntryInput,
+    @CurrentUser() user: User,
+  ) {
+    const { assignmentId, ...entryData } = data;
+    const currentUser = await this.usersService.findOneById(Number(user.id));
     const assignment = assignmentId
       ? await this.assignmentsService.findOneById(Number(assignmentId))
       : undefined;
     if (assignmentId && !assignment) {
       throw new BadRequestException('assignment not found');
     }
-    const entry = await this.entriesService.create(entryData, user, assignment);
+    if (assignment && assignment.userId !== currentUser.id) {
+      throw new UnauthorizedException(
+        'You are not allwed to add entries for this assignment',
+      );
+    }
+    const entry = await this.entriesService.create(
+      entryData,
+      currentUser,
+      assignment,
+    );
     pubSub.publish('entryAdded', { entryAdded: entry });
     return entry;
   }
@@ -104,10 +116,18 @@ export class EntriesResolver {
 
   @Mutation((returns) => Entry)
   @UseGuards(GqlAuthGuard)
-  async removeEntry(@Args('id', { type: () => ID }) id: string) {
+  async removeEntry(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: User,
+  ) {
     const entry = await this.entriesService.findOneById(Number(id));
     if (!entry) {
       throw new NotFoundException('entry not found');
+    }
+    if (entry.userId !== Number(user.id)) {
+      throw new UnauthorizedException(
+        'You are not allowed to remove this entry',
+      );
     }
     const copy = { ...entry };
     await this.entriesService.remove(entry);

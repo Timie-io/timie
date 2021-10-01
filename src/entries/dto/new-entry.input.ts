@@ -11,9 +11,6 @@ export class NewEntryInput {
   @Field({ nullable: true })
   note: string;
 
-  @Field((type) => ID)
-  userId: string;
-
   @Field((type) => ID, { nullable: true })
   assignmentId: string;
 }
