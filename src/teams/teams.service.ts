@@ -4,13 +4,22 @@ import { FindManyOptions, ILike, Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
 import { TeamsFindArgs } from './dto/teams-find.args';
+import { TeamsViewArgs } from './dto/teams-view.args';
+import { TeamView } from './models/team-view.model';
 import { Team } from './team.entity';
+import { TeamsView } from './teams.view-entity';
 
 @Injectable()
 export class TeamsService {
   constructor(
     @InjectRepository(Team) private readonly repository: Repository<Team>,
+    @InjectRepository(TeamsView)
+    private readonly teamsView: Repository<TeamsView>,
   ) {}
+
+  async findView(args: TeamsViewArgs): Promise<[TeamView[], number]> {
+    return [[], 0];
+  }
 
   async findAll(
     args: TeamsFindArgs,
