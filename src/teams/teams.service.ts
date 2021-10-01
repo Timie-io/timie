@@ -41,7 +41,7 @@ export class TeamsService {
     }
     if (args.ownerId) {
       query.andWhere('team.ownerId = :ownerId', {
-        ownerId: args.ownerId,
+        ownerId: Number(args.ownerId),
       });
     }
     if (args.skip) {

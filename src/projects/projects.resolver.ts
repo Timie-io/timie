@@ -23,9 +23,11 @@ import { UsersService } from '../users/users.service';
 import { NewProjectInput } from './dto/new-project-input';
 import { ProjectAddedInput } from './dto/project-added.input';
 import { ProjectsFindArgs } from './dto/projects-find.args';
+import { ProjectsViewArgs } from './dto/projects-view.args';
 import { UpdateProjectInput } from './dto/update-project.input';
 import { Project } from './models/project.model';
 import { ProjectsResult } from './models/projects-result.model';
+import { ProjectsViewResult } from './models/projects-view-result.model';
 import { ProjectsService } from './projects.service';
 
 const pubSub = new PubSub();
@@ -70,6 +72,16 @@ export class ProjectsResolver {
   @UseGuards(GqlAuthGuard)
   async projects(@Args() args: ProjectsFindArgs) {
     const [result, total] = await this.projectsService.findAll(args);
+    return {
+      result,
+      total,
+    };
+  }
+
+  @Query((returns) => ProjectsViewResult)
+  @UseGuards(GqlAuthGuard)
+  async projectsView(@Args() args: ProjectsViewArgs) {
+    const [result, total] = await this.projectsService.findView(args);
     return {
       result,
       total,

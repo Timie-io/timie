@@ -114,6 +114,23 @@ type ProjectsResult {
   total: Int!
 }
 
+type ProjectView {
+  id: ID!
+  name: String!
+  description: String!
+  ownerId: ID!
+  ownerName: String!
+  teamId: ID
+  teamName: String
+  created: Date!
+  active: Boolean!
+}
+
+type ProjectsViewResult {
+  result: [ProjectView!]!
+  total: Int!
+}
+
 type TasksResult {
   result: [Task!]!
   total: Int!
@@ -145,6 +162,7 @@ type Query {
   myTeams: [Team!]
   project(id: ID!): Project!
   projects(skip: Int = 0, take: Int = 25, name: String, active: Boolean, ownerId: ID, teamId: ID): ProjectsResult!
+  projectsView(skip: Int = 0, take: Int = 25, search: String, active: Boolean, ownerId: ID, teamId: ID, sortBy: [SortInput]): ProjectsViewResult!
   myProjects: [Project!]
   task(id: ID!): Task!
   tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean, followerIds: [ID!], sortBy: [SortInput]): TasksResult!
