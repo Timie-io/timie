@@ -23,9 +23,11 @@ import { UsersService } from '../users/users.service';
 import { NewTaskInput } from './dto/new-task.input';
 import { TaskAddedInput } from './dto/task-added.input';
 import { TasksFindArgs } from './dto/tasks-find.args';
+import { TasksViewArgs } from './dto/tasks-view.args';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { Task } from './models/task.model';
 import { TasksResult } from './models/tasks-result.model';
+import { TasksViewResult } from './models/tasks-view-result.model';
 import { Task as TaskEntity } from './task.entity';
 import { TasksService } from './tasks.service';
 
@@ -114,6 +116,16 @@ export class TasksResolver {
   @UseGuards(GqlAuthGuard)
   async tasks(@Args() args: TasksFindArgs) {
     const [result, total] = await this.tasksService.findAll(args);
+    return {
+      result,
+      total,
+    };
+  }
+
+  @Query((returns) => TasksViewResult)
+  @UseGuards(GqlAuthGuard)
+  async tasksView(@Args() args: TasksViewArgs) {
+    const [result, total] = await this.tasksService.findView(args);
     return {
       result,
       total,

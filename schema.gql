@@ -136,6 +136,25 @@ type TasksResult {
   total: Int!
 }
 
+type TaskView {
+  id: ID!
+  title: String!
+  description: String!
+  projectId: ID!
+  projectName: String!
+  active: Boolean!
+  created: Date!
+  creatorId: ID!
+  creatorName: String!
+  modified: Date
+  priority: Int!
+}
+
+type TasksViewResult {
+  result: [TaskView!]!
+  total: Int!
+}
+
 type AssignmentsResult {
   result: [Assignment!]!
   total: Int!
@@ -166,6 +185,7 @@ type Query {
   myProjects: [Project!]
   task(id: ID!): Task!
   tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean, followerIds: [ID!], sortBy: [SortInput]): TasksResult!
+  tasksView(skip: Int = 0, take: Int = 25, search: String, projectId: ID, active: Boolean, followerIds: [ID!], sortBy: [SortInput]): TasksViewResult!
   assignment(id: ID!): Assignment!
   assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, statusCode: ID): AssignmentsResult!
   status(code: ID!): Status!

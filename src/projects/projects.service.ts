@@ -52,7 +52,7 @@ export class ProjectsService {
         }),
       );
     }
-    if (args.active) {
+    if (args.active !== undefined) {
       query.andWhere('project.active = :active', { active: args.active });
     }
     if (args.ownerId) {
@@ -101,7 +101,7 @@ export class ProjectsService {
     if (args.name) {
       Object.assign(filter.where, { name: ILike(`%${args.name}%`) });
     }
-    if (args.active) {
+    if (args.active !== undefined) {
       Object.assign(filter.where, { active: args.active });
     }
     if (args.ownerId) {
