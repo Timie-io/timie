@@ -25,10 +25,12 @@ import { UsersService } from '../users/users.service';
 import { AssignmentsService } from './assignments.service';
 import { AssignmentAddedInput } from './dto/assignment-added.input';
 import { AssignmentsFindArgs } from './dto/assignments-find.args';
+import { AssignmentsViewArgs } from './dto/assignments-view.args';
 import { NewAssignmentInput } from './dto/new-assignment.input';
 import { UpdateAssignmentInput } from './dto/update-assignment.input';
 import { Assignment } from './models/assignment.model';
 import { AssignmentsResult } from './models/assignments-result.model';
+import { AssignmentsViewResult } from './models/assignments-view-result.model';
 
 const pubSub = new PubSub();
 
@@ -115,6 +117,16 @@ export class AssignmentsResolver {
   @UseGuards(GqlAuthGuard)
   async assignments(@Args() args: AssignmentsFindArgs) {
     const [result, total] = await this.assignmentsService.findAll(args);
+    return {
+      result,
+      total,
+    };
+  }
+
+  @Query((returns) => AssignmentsViewResult)
+  @UseGuards(GqlAuthGuard)
+  async assignmentsView(@Args() args: AssignmentsViewArgs) {
+    const [result, total] = await this.assignmentsService.findView(args);
     return {
       result,
       total,
