@@ -32,6 +32,6 @@ export class EntryView {
   @Field({ nullable: true })
   taskTitle: string;
 
-  @Field()
+  @Field({ nullable: true })
   totalTime: number;
 }
