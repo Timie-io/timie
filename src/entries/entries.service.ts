@@ -1,15 +1,29 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, ILike, Repository } from 'typeorm';
+import { Brackets, FindManyOptions, ILike, Repository } from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
 import { User } from '../users/user.entity';
 import { EntriesFindArgs } from './dto/entries-find.args';
+import { EntriesViewArgs } from './dto/entries-view.args';
+import { EntryView } from './entry-view.entity';
 import { Entry } from './entry.entity';
+
+const sortableFields = {
+  startTime: 'entries."startTime"',
+  finishTime: 'entries."finishTime"',
+  note: 'entries.note',
+  user: 'entries."userName"',
+  assignment: 'entries."assignmentNote"',
+  task: 'entries."taskTitle"',
+  totalTime: 'entries."totalTime"',
+};
 
 @Injectable()
 export class EntriesService {
   constructor(
     @InjectRepository(Entry) private readonly repository: Repository<Entry>,
+    @InjectRepository(EntryView)
+    private readonly entriesView: Repository<EntryView>,
   ) {}
 
   async findOneById(
@@ -17,6 +31,67 @@ export class EntriesService {
     ...relations: string[]
   ): Promise<Entry | undefined> {
     return await this.repository.findOne(id, { relations });
+  }
+
+  async findView(
+    args: EntriesViewArgs,
+  ): Promise<[EntryView[], number, number]> {
+    const query = this.entriesView.createQueryBuilder('entries');
+    if (args.search) {
+      query.where(
+        new Brackets((qb) => {
+          qb.where('entries.note ilike :search', {
+            search: `%${args.search}%`,
+          });
+          qb.orWhere('entries."userName" ilike :search', {
+            search: `%${args.search}%`,
+          });
+          qb.orWhere('entries."assignmentNote" ilike :search', {
+            search: `%${args.search}%`,
+          });
+          qb.orWhere('entries."taskTitle" ilike :search', {
+            search: `%${args.search}%`,
+          });
+        }),
+      );
+    }
+    if (args.userId) {
+      query.andWhere('entries."userId" = :userId', { userId: args.userId });
+    }
+    if (args.assignmentId) {
+      query.andWhere('entries."assignmentId" = :assignmentId', {
+        assignmentId: args.assignmentId,
+      });
+    }
+    if (args.taskId) {
+      query.andWhere('entries."taskId" = :taskId', { taskId: args.taskId });
+    }
+    if (args.skip) {
+      query.skip(args.skip);
+    }
+    if (args.take) {
+      query.take(args.take);
+    }
+    if (args.sortBy) {
+      for (let sort of args.sortBy) {
+        if (sort.columnName in sortableFields) {
+          query.addOrderBy(sortableFields[sort.columnName], sort.sortType);
+        }
+      }
+    } else {
+      query.orderBy('entries.id', 'DESC');
+    }
+
+    const total = await query.getCount();
+    const result = await query.getMany();
+
+    const totalQuery = query
+      .select('sum(entries."totalTime")', 'total')
+      .orderBy();
+
+    const totalTime = await totalQuery.getRawOne<{ total: number }>();
+
+    return [result, total, totalTime.total];
   }
 
   async findAll(
@@ -63,9 +138,6 @@ export class EntriesService {
     entry.user = user;
     if (assignment) {
       entry.assignment = assignment;
-      if (!entry.note) {
-        entry.note = assignment.note;
-      }
     }
     return this.repository.save(entry);
   }

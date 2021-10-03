@@ -21,11 +21,13 @@ import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { User } from '../users/models/user.model';
 import { UsersService } from './../users/users.service';
 import { EntriesFindArgs } from './dto/entries-find.args';
+import { EntriesViewArgs } from './dto/entries-view.args';
 import { EntryChangedInput } from './dto/entry-changed.input';
 import { NewEntryInput } from './dto/new-entry.input';
 import { UpdateEntryInput } from './dto/update-entry.input';
 import { EntriesService } from './entries.service';
 import { EntriesResult } from './models/entries-result.model';
+import { EntriesViewResult } from './models/entries-view-result.model';
 import { Entry } from './models/entry.model';
 
 const pubSub = new PubSub();
@@ -66,6 +68,17 @@ export class EntriesResolver {
   @UseGuards(GqlAuthGuard)
   async entries(@Args() args: EntriesFindArgs) {
     const [result, total, totalTime] = await this.entriesService.findAll(args);
+    return {
+      result,
+      total,
+      totalTime,
+    };
+  }
+
+  @Query((returns) => EntriesViewResult)
+  @UseGuards(GqlAuthGuard)
+  async entriesView(@Args() args: EntriesViewArgs) {
+    const [result, total, totalTime] = await this.entriesService.findView(args);
     return {
       result,
       total,

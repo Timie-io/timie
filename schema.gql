@@ -189,7 +189,27 @@ type CommentsResult {
 type EntriesResult {
   result: [Entry!]!
   total: Int!
+  totalTime: Int
+}
+
+type EntryView {
+  id: ID!
+  startTime: Date!
+  finishTime: Date
+  note: String
+  userId: ID!
+  userName: String!
+  assignmentId: ID
+  assignmentNote: String
+  taskId: ID
+  taskTitle: String
   totalTime: Int!
+}
+
+type EntriesViewResult {
+  result: [EntryView!]!
+  total: Int!
+  totalTime: Int
 }
 
 type Query {
@@ -214,6 +234,7 @@ type Query {
   statuses: [Status!]!
   entry(id: ID!): ID!
   entries(skip: Int = 0, take: Int = 25, note: String, userId: ID, assignmentId: ID): EntriesResult!
+  entriesView(skip: Int = 0, take: Int = 25, search: String, userId: ID, assignmentId: ID, taskId: ID, sortBy: [SortInput]): EntriesViewResult!
   comment(id: ID!): Comment!
   comments(skip: Int = 0, take: Int = 25, taskId: ID, userId: ID): CommentsResult!
 }
