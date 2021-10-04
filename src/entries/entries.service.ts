@@ -109,6 +109,8 @@ export class EntriesService {
 
     const totalQuery = query
       .select('sum(entries."totalTime")', 'total')
+      .skip()
+      .take()
       .orderBy();
 
     const totalTime = await totalQuery.getRawOne<{ total: number }>();
