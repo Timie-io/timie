@@ -26,6 +26,12 @@ export class AssignmentView {
   @Field()
   taskTitle: string;
 
+  @Field((type) => ID)
+  projectId: string;
+
+  @Field()
+  projectName: string;
+
   @Field({ nullable: true })
   note: string;
 

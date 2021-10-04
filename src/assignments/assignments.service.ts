@@ -16,6 +16,7 @@ const sortableFields = {
   creator: 'assignment."creatorName"',
   user: 'assignment."userName"',
   task: 'assignment."taskTitle"',
+  project: 'assignment."projectName"',
   status: 'assignment."statusLabel"',
   time: 'assignment."totalTime"',
 };
@@ -48,35 +49,43 @@ export class AssignmentsService {
           qb.where('assignment.note ilike :search', {
             search: `%${args.search}%`,
           });
-          qb.orWhere('assignment.creatorName ilike :search', {
+          qb.orWhere('assignment."creatorName" ilike :search', {
             search: `%${args.search}%`,
           });
-          qb.orWhere('assignment.userName ilike :search', {
+          qb.orWhere('assignment."userName" ilike :search', {
             search: `%${args.search}%`,
           });
-          qb.orWhere('assignment.taskTitle ilike :search', {
+          qb.orWhere('assignment."taskTitle" ilike :search', {
+            search: `%${args.search}%`,
+          });
+          qb.orWhere('assignment."projectName" ilike :search', {
             search: `%${args.search}%`,
           });
         }),
       );
     }
     if (args.creatorId) {
-      query.andWhere('assignment.creatorId = :creatorId', {
+      query.andWhere('assignment."creatorId" = :creatorId', {
         creatorId: args.creatorId,
       });
     }
     if (args.userId) {
-      query.andWhere('assignment.userId = :userId', {
+      query.andWhere('assignment."userId" = :userId', {
         userId: args.userId,
       });
     }
     if (args.taskId) {
-      query.andWhere('assignment.taskId = :taskId', {
+      query.andWhere('assignment."taskId" = :taskId', {
         taskId: args.taskId,
       });
     }
+    if (args.projectId) {
+      query.andWhere('assignment."projectId" = :projectId', {
+        projectId: args.projectId,
+      });
+    }
     if (args.statusCode) {
-      query.andWhere('assignment.statusCode = :statusCode', {
+      query.andWhere('assignment."statusCode" = :statusCode', {
         statusCode: args.statusCode,
       });
     }

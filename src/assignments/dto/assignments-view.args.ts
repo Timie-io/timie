@@ -17,6 +17,9 @@ export class AssignmentsViewArgs extends FindArgs {
   taskId: string;
 
   @Field((type) => ID, { nullable: true })
+  projectId: string;
+
+  @Field((type) => ID, { nullable: true })
   statusCode: string;
 
   @Field((type) => [SortInput], { nullable: 'itemsAndList' })

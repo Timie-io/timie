@@ -1,5 +1,6 @@
 import { Connection, ViewColumn, ViewEntity } from 'typeorm';
 import { Entry } from '../entries/entry.entity';
+import { Project } from '../projects/project.entity';
 import { Status } from '../status/status.entity';
 import { Task } from '../tasks/task.entity';
 import { User } from '../users/user.entity';
@@ -19,6 +20,8 @@ import { Assignment } from './assignment.entity';
       .addSelect('user.name', 'userName')
       .addSelect('task.id', 'taskId')
       .addSelect('task.title', 'taskTitle')
+      .addSelect('project.id', 'projectId')
+      .addSelect('project.name', 'projectName')
       .addSelect('status.code', 'statusCode')
       .addSelect('status.label', 'statusLabel')
       .addSelect('entries.total', 'totalTime')
@@ -26,6 +29,7 @@ import { Assignment } from './assignment.entity';
       .leftJoin(User, 'user', 'user.id = assignment."userId"')
       .leftJoin(User, 'creator', 'creator.id = assignment."creatorId"')
       .leftJoin(Task, 'task', 'task.id = assignment."taskId"')
+      .leftJoin(Project, 'project', 'project.id = task."projectId"')
       .leftJoin(Status, 'status', 'status.code = assignment."statusCode"')
       .leftJoin(
         (qb) => {
@@ -73,6 +77,12 @@ export class AssignmentView {
 
   @ViewColumn()
   taskTitle: string;
+
+  @ViewColumn()
+  projectId: number;
+
+  @ViewColumn()
+  projectName: string;
 
   @ViewColumn()
   statusCode: string;

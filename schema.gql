@@ -169,6 +169,8 @@ type AssignmentView {
   userName: String!
   taskId: ID!
   taskTitle: String!
+  projectId: ID!
+  projectName: String!
   note: String
   deadline: Date
   statusCode: ID
@@ -231,7 +233,7 @@ type Query {
   tasksView(skip: Int = 0, take: Int = 25, search: String, projectId: ID, active: Boolean, followerIds: [ID!], sortBy: [SortInput]): TasksViewResult!
   assignment(id: ID!): Assignment!
   assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, statusCode: ID): AssignmentsResult!
-  assignmentsView(skip: Int = 0, take: Int = 25, search: String, creatorId: ID, userId: ID, taskId: ID, statusCode: ID, sortBy: [SortInput]): AssignmentsViewResult!
+  assignmentsView(skip: Int = 0, take: Int = 25, search: String, creatorId: ID, userId: ID, taskId: ID, projectId: ID, statusCode: ID, sortBy: [SortInput]): AssignmentsViewResult!
   status(code: ID!): Status!
   statuses: [Status!]!
   entry(id: ID!): ID!
