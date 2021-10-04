@@ -15,6 +15,7 @@ const sortableFields = {
   user: 'entries."userName"',
   assignment: 'entries."assignmentNote"',
   task: 'entries."taskTitle"',
+  project: 'entries."projectId"',
   totalTime: 'entries."totalTime"',
 };
 
@@ -52,6 +53,9 @@ export class EntriesService {
           qb.orWhere('entries."taskTitle" ilike :search', {
             search: `%${args.search}%`,
           });
+          qb.orWhere('entries."projectName" ilike :search', {
+            search: `%${args.search}%`,
+          });
         }),
       );
     }
@@ -65,6 +69,11 @@ export class EntriesService {
     }
     if (args.taskId) {
       query.andWhere('entries."taskId" = :taskId', { taskId: args.taskId });
+    }
+    if (args.projectId) {
+      query.andWhere('entries."projectId" = :projectId', {
+        projectId: args.projectId,
+      });
     }
     if (args.skip) {
       query.skip(args.skip);

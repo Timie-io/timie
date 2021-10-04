@@ -33,5 +33,11 @@ export class EntryView {
   taskTitle: string;
 
   @Field({ nullable: true })
+  projectId: string;
+
+  @Field({ nullable: true })
+  projectName: string;
+
+  @Field({ nullable: true })
   totalTime: number;
 }
