@@ -10,9 +10,9 @@ import { AssignmentsFindArgs } from './dto/assignments-find.args';
 import { AssignmentsViewArgs } from './dto/assignments-view.args';
 
 const sortableFields = {
-  note: 'assignment.note',
-  deadline: 'assignment.deadline',
-  created: 'assignment.created',
+  note: 'assignment."note"',
+  deadline: 'assignment."deadline"',
+  created: 'assignment."created"',
   creator: 'assignment."creatorName"',
   user: 'assignment."userName"',
   task: 'assignment."taskTitle"',
@@ -24,6 +24,7 @@ const sortableFields = {
 const sortableOptions = {
   deadline: 'NULLS LAST',
   time: 'NULLS LAST',
+  note: 'NULLS LAST',
 };
 
 @Injectable()

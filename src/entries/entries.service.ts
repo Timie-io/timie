@@ -19,6 +19,15 @@ const sortableFields = {
   totalTime: 'entries."totalTime"',
 };
 
+const sortableOptions = {
+  finishTime: 'NULLS LAST',
+  note: 'NULLS LAST',
+  assignment: 'NULLS LAST',
+  task: 'NULLS LAST',
+  project: 'NULLS LAST',
+  totalTime: 'NULLS LAST',
+};
+
 @Injectable()
 export class EntriesService {
   constructor(
@@ -84,7 +93,11 @@ export class EntriesService {
     if (args.sortBy) {
       for (let sort of args.sortBy) {
         if (sort.columnName in sortableFields) {
-          query.addOrderBy(sortableFields[sort.columnName], sort.sortType);
+          query.addOrderBy(
+            sortableFields[sort.columnName],
+            sort.sortType,
+            sortableOptions[sort.columnName],
+          );
         }
       }
     } else {
