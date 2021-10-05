@@ -5,7 +5,7 @@ export class EntryView {
   @Field((type) => ID)
   id: string;
 
-  @Field()
+  @Field({ nullable: true })
   startTime: Date;
 
   @Field({ nullable: true })
