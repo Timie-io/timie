@@ -74,7 +74,7 @@ export class TeamsService {
       skip: args.skip,
       take: args.take,
       order: {
-        id: 'DESC',
+        name: 'ASC',
       },
       relations,
     } as FindManyOptions;

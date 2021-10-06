@@ -29,7 +29,7 @@ export class UsersService {
   }
 
   async findAll(args?: FindArgs): Promise<User[]> {
-    return await this.repository.find(args);
+    return await this.repository.find({ ...args, order: { name: 'ASC' } });
   }
 
   async update(user: User, data: Partial<User>): Promise<User> {

@@ -78,7 +78,7 @@ export class ProjectsService {
         }
       }
     } else {
-      query.orderBy('project.id', 'DESC');
+      query.orderBy('project.name', 'ASC');
     }
     const total = await query.getCount();
     const result = await query.getMany();
@@ -94,7 +94,7 @@ export class ProjectsService {
       skip: args.skip,
       take: args.take,
       order: {
-        id: 'DESC',
+        name: 'ASC',
       },
       relations,
     } as FindManyOptions;
