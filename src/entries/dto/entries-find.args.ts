@@ -11,4 +11,7 @@ export class EntriesFindArgs extends FindArgs {
 
   @Field((type) => ID, { nullable: true })
   assignmentId: string;
+
+  @Field({ nullable: true })
+  isRunning: boolean;
 }

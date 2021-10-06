@@ -140,6 +140,9 @@ export class EntriesService {
     if (args.assignmentId) {
       Object.assign(filter.where, { assignmentId: Number(args.assignmentId) });
     }
+    if (args.isRunning) {
+      Object.assign(filter.where, { finishTime: null });
+    }
 
     let totalTime = 0;
     const [result, total] = await this.repository.findAndCount(filter);
