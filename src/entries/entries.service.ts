@@ -15,7 +15,8 @@ const sortableFields = {
   user: 'entries."userName"',
   assignment: 'entries."assignmentNote"',
   task: 'entries."taskTitle"',
-  project: 'entries."projectId"',
+  project: 'entries."projectName"',
+  team: 'entries."teamName"',
   totalTime: 'entries."totalTime"',
 };
 
@@ -25,6 +26,7 @@ const sortableOptions = {
   assignment: 'NULLS LAST',
   task: 'NULLS LAST',
   project: 'NULLS LAST',
+  team: 'NULLS LAST',
   totalTime: 'NULLS LAST',
 };
 
@@ -83,6 +85,22 @@ export class EntriesService {
       query.andWhere('entries."projectId" = :projectId', {
         projectId: args.projectId,
       });
+    }
+    if (args.teamId) {
+      query.andWhere('entries."teamId" = :teamId', {
+        teamId: args.teamId,
+      });
+    }
+    if (args.fromTime || args.toTime) {
+      query.andWhere('entries.startTime is not null');
+    }
+    if (args.fromTime) {
+      query.andWhere('entries.startTime >= :fromTime', {
+        fromTime: args.fromTime,
+      });
+    }
+    if (args.toTime) {
+      query.andWhere('entries.startTime <= :toTime', { toTime: args.toTime });
     }
     if (args.skip) {
       query.skip(args.skip);

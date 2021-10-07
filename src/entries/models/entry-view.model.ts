@@ -38,6 +38,12 @@ export class EntryView {
   @Field({ nullable: true })
   projectName: string;
 
+  @Field((type) => ID, { nullable: true })
+  teamId: string;
+
+  @Field({ nullable: true })
+  teamName: string;
+
   @Field({ nullable: true })
   totalTime: number;
 }

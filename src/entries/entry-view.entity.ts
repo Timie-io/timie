@@ -2,6 +2,7 @@ import { Connection, ViewColumn, ViewEntity } from 'typeorm';
 import { Assignment } from '../assignments/assignment.entity';
 import { Project } from '../projects/project.entity';
 import { Task } from '../tasks/task.entity';
+import { Team } from '../teams/team.entity';
 import { User } from '../users/user.entity';
 import { Entry } from './entry.entity';
 
@@ -21,6 +22,8 @@ import { Entry } from './entry.entity';
       .addSelect('task.title', 'taskTitle')
       .addSelect('project.id', 'projectId')
       .addSelect('project.name', 'projectName')
+      .addSelect('team.id', 'teamId')
+      .addSelect('team.name', 'teamName')
       .addSelect(
         '(extract(epoch from (entry."finishTime" - entry."startTime")) * 1000)::int',
         'totalTime',
@@ -33,7 +36,8 @@ import { Entry } from './entry.entity';
         'assignment.id = entry."assignmentId"',
       )
       .leftJoin(Task, 'task', 'task.id = assignment."taskId"')
-      .leftJoin(Project, 'project', 'project.id = task."projectId"'),
+      .leftJoin(Project, 'project', 'project.id = task."projectId"')
+      .leftJoin(Team, 'team', 'team.id = project.teamId'),
 })
 export class EntryView {
   @ViewColumn()
@@ -71,6 +75,12 @@ export class EntryView {
 
   @ViewColumn()
   projectName: string;
+
+  @ViewColumn()
+  teamId: string;
+
+  @ViewColumn()
+  teamName: string;
 
   @ViewColumn()
   totalTime: number;

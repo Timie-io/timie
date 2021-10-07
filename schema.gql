@@ -207,6 +207,8 @@ type EntryView {
   taskTitle: String
   projectId: String
   projectName: String
+  teamId: ID
+  teamName: String
   totalTime: Int
 }
 
@@ -238,7 +240,7 @@ type Query {
   statuses: [Status!]!
   entry(id: ID!): ID!
   entries(skip: Int = 0, take: Int = 25, note: String, userId: ID, assignmentId: ID, isRunning: Boolean): EntriesResult!
-  entriesView(skip: Int = 0, take: Int = 25, search: String, userId: ID, assignmentId: ID, taskId: ID, projectId: ID, sortBy: [SortInput]): EntriesViewResult!
+  entriesView(skip: Int = 0, take: Int = 25, search: String, userId: ID, assignmentId: ID, taskId: ID, projectId: ID, teamId: ID, fromTime: Date, toTime: Date, sortBy: [SortInput]): EntriesViewResult!
   comment(id: ID!): Comment!
   comments(skip: Int = 0, take: Int = 25, taskId: ID, userId: ID): CommentsResult!
 }

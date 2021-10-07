@@ -19,6 +19,15 @@ export class EntriesViewArgs extends FindArgs {
   @Field((type) => ID, { nullable: true })
   projectId: string;
 
+  @Field((type) => ID, { nullable: true })
+  teamId: string;
+
+  @Field({ nullable: true })
+  fromTime: Date;
+
+  @Field({ nullable: true })
+  toTime: Date;
+
   @Field((type) => [SortInput], { nullable: 'itemsAndList' })
   sortBy: [SortInput];
 }
