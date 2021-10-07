@@ -11,4 +11,7 @@ export class AssignmentsFindArgs extends FindArgs {
 
   @Field((type) => ID, { nullable: true })
   statusCode: string;
+
+  @Field({ nullable: true })
+  active: boolean;
 }

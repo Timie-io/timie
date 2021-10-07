@@ -97,10 +97,7 @@ export class TasksService {
     return [result, total];
   }
 
-  async findAll(
-    args: TasksFindArgs,
-    ...relations: string[]
-  ): Promise<[Task[], number]> {
+  async findAll(args: TasksFindArgs): Promise<[Task[], number]> {
     let query = this.repository.createQueryBuilder('task');
     if (args.title) {
       query.andWhere('task.title ilike :title', {

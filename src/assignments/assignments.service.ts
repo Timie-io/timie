@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
 import { Status } from '../status/status.entity';
@@ -34,6 +35,7 @@ export class AssignmentsService {
     private readonly repository: Repository<Assignment>,
     @InjectRepository(AssignmentView)
     private readonly assignmentsView: Repository<AssignmentView>,
+    private readonly configService: ConfigService,
   ) {}
 
   async findOneById(id: number, ...relations): Promise<Assignment | undefined> {
@@ -117,10 +119,7 @@ export class AssignmentsService {
     return [result, total];
   }
 
-  async findAll(
-    args: AssignmentsFindArgs,
-    ...relations: string[]
-  ): Promise<[Assignment[], number]> {
+  async findAll(args: AssignmentsFindArgs): Promise<[Assignment[], number]> {
     let query = this.repository.createQueryBuilder('assignment');
     if (args.userId) {
       query.andWhere('assignment.userId = :userId', {
@@ -135,6 +134,11 @@ export class AssignmentsService {
     if (args.statusCode) {
       query.andWhere('assignment.statusCode = :statusCode', {
         statusCode: args.statusCode,
+      });
+    }
+    if (args.active) {
+      query.andWhere('assignment.statusCode NOT IN (:...codes)', {
+        codes: this.configService.get<string>('STATUS_FINISHED').split(','),
       });
     }
     if (args.skip) {

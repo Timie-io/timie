@@ -232,7 +232,7 @@ type Query {
   tasks(skip: Int = 0, take: Int = 25, title: String, projectId: ID, active: Boolean, followerIds: [ID!], sortBy: [SortInput]): TasksResult!
   tasksView(skip: Int = 0, take: Int = 25, search: String, projectId: ID, active: Boolean, followerIds: [ID!], sortBy: [SortInput]): TasksViewResult!
   assignment(id: ID!): Assignment!
-  assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, statusCode: ID): AssignmentsResult!
+  assignments(skip: Int = 0, take: Int = 25, userId: ID, taskId: ID, statusCode: ID, active: Boolean): AssignmentsResult!
   assignmentsView(skip: Int = 0, take: Int = 25, search: String, creatorId: ID, userId: ID, taskId: ID, projectId: ID, statusCode: ID, sortBy: [SortInput]): AssignmentsViewResult!
   status(code: ID!): Status!
   statuses: [Status!]!
