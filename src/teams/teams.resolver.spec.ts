@@ -10,8 +10,10 @@ import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewTeamInput } from './dto/new-team.input';
 import { TeamsFindArgs } from './dto/teams-find.args';
+import { TeamsViewArgs } from './dto/teams-view.args';
 import { UpdateTeamInput } from './dto/update-team.input';
 import { Team as TeamModel } from './models/team.model';
+import { TeamView } from './team-view.entity';
 import { Team } from './team.entity';
 import { TeamsResolver } from './teams.resolver';
 import { TeamsService } from './teams.service';
@@ -21,6 +23,7 @@ describe('TeamsResolver', () => {
   let teamsService: Partial<TeamsService>;
   let usersService: Partial<UsersService>;
   let team: Partial<Team>;
+  let teamView: Partial<TeamView>;
   let user: Partial<User>;
   let teamModel: TeamModel;
   let userModel: UserModel;
@@ -46,6 +49,13 @@ describe('TeamsResolver', () => {
       projects: [],
     };
 
+    teamView = {
+      id: team.id,
+      name: team.name,
+      description: team.description,
+      ownerName: user.name,
+    };
+
     userModel = {
       ...user,
       id: '1',
@@ -69,6 +79,9 @@ describe('TeamsResolver', () => {
     teamsService = {
       async findAll(args, ...relations) {
         return [[team as Team], 1];
+      },
+      async findView(args) {
+        return [[teamView as TeamView], 1];
       },
       async findOneById(id: number, ...relations: string[]): Promise<Team> {
         return team as Team;
@@ -158,6 +171,14 @@ describe('TeamsResolver', () => {
     const args: Partial<TeamsFindArgs> = { skip: 0, take: 25 };
     expect(await resolver.teams(args as TeamsFindArgs)).toEqual({
       result: [team as Team],
+      total: 1,
+    });
+  });
+
+  it('should resolve all of the view teams', async () => {
+    const result = [teamView as TeamView];
+    expect(await resolver.teamsView({} as TeamsViewArgs)).toEqual({
+      result: result,
       total: 1,
     });
   });

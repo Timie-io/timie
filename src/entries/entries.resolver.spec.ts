@@ -5,10 +5,12 @@ import { User as UserModel } from '../users/models/user.model';
 import { User } from '../users/user.entity';
 import { UsersService } from './../users/users.service';
 import { EntriesFindArgs } from './dto/entries-find.args';
+import { EntriesViewArgs } from './dto/entries-view.args';
 import { NewEntryInput } from './dto/new-entry.input';
 import { UpdateEntryInput } from './dto/update-entry.input';
 import { EntriesResolver } from './entries.resolver';
 import { EntriesService } from './entries.service';
+import { EntryView } from './entry-view.entity';
 import { Entry } from './entry.entity';
 
 describe('EntriesResolver', () => {
@@ -52,6 +54,9 @@ describe('EntriesResolver', () => {
       },
       async findAll(args, ...relations) {
         return [[entry as Entry], 1, 0];
+      },
+      async findView(args) {
+        return [[entry as EntryView], 1, 1];
       },
       async create(data, assignment) {
         return entry as Entry;
@@ -118,6 +123,14 @@ describe('EntriesResolver', () => {
       result: [entry as Entry],
       total: 1,
       totalTime: 0,
+    });
+  });
+
+  it('should resolve the view', async () => {
+    expect(await resolver.entriesView({} as EntriesViewArgs)).toEqual({
+      result: [entry as EntryView],
+      total: 1,
+      totalTime: 1,
     });
   });
 

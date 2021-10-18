@@ -6,12 +6,15 @@ import { MockType } from '../shared/mocks/mock.type';
 import { MockRepository } from '../shared/mocks/repository.mock';
 import { User } from '../users/user.entity';
 import { TeamsFindArgs } from './dto/teams-find.args';
+import { TeamsViewArgs } from './dto/teams-view.args';
+import { TeamView } from './team-view.entity';
 import { Team } from './team.entity';
 import { TeamsService } from './teams.service';
 
 describe('TeamsService', () => {
   let service: TeamsService;
   let repository: MockType<Repository<Team>>;
+  let viewRepository: MockType<Repository<TeamView>>;
   let user: Partial<User>;
 
   beforeEach(async () => {
@@ -20,6 +23,10 @@ describe('TeamsService', () => {
         TeamsService,
         {
           provide: getRepositoryToken(Team),
+          useClass: MockRepository,
+        },
+        {
+          provide: getRepositoryToken(TeamView),
           useClass: MockRepository,
         },
       ],
@@ -41,6 +48,7 @@ describe('TeamsService', () => {
 
     service = module.get<TeamsService>(TeamsService);
     repository = module.get(getRepositoryToken(Team));
+    viewRepository = module.get(getRepositoryToken(TeamView));
   });
 
   it('should be defined', () => {
@@ -141,6 +149,41 @@ describe('TeamsService', () => {
     repository.findAndCount.mockReturnValue([output, 2]);
     const args: Partial<TeamsFindArgs> = { skip: 0, take: 25 };
     expect(await service.findAll(args as TeamsFindArgs)).toEqual([output, 2]);
+  });
+
+  it('should list all teams from the view', async () => {
+    const output = [
+      {
+        id: 1,
+        name: 'My Awesome Team 1',
+      },
+      {
+        id: 2,
+        name: 'My Awesome Team 2',
+      },
+    ];
+    const query = {
+      select: () => query,
+      where: () => query,
+      orWhere: () => query,
+      andWhere: () => query,
+      skip: () => query,
+      take: () => query,
+      orderBy: () => query,
+      addOrderBy: () => query,
+      getCount: () => 2,
+      getMany: () => output,
+      getRawOne: () => {
+        return {
+          total: 2,
+        };
+      },
+    };
+    viewRepository.createQueryBuilder.mockReturnValue({
+      ...query,
+    });
+    const args: Partial<TeamsViewArgs> = {};
+    expect(await service.findView(args as TeamsViewArgs)).toEqual([output, 2]);
   });
 
   it('should add a user as a team member', async () => {

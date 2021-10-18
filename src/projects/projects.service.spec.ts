@@ -6,15 +6,19 @@ import { MockRepository } from '../shared/mocks/repository.mock';
 import { Team } from '../teams/team.entity';
 import { User } from '../users/user.entity';
 import { ProjectsFindArgs } from './dto/projects-find.args';
+import { ProjectsViewArgs } from './dto/projects-view.args';
+import { ProjectView } from './project-view.entity';
 import { Project } from './project.entity';
 import { ProjectsService } from './projects.service';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;
   let repository: MockType<Repository<Project>>;
+  let viewRepository: MockType<Repository<ProjectView>>;
   let user: Partial<User>;
   let team: Partial<Team>;
   let project: Partial<Project>;
+  let projectView: Partial<ProjectView>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,6 +26,10 @@ describe('ProjectsService', () => {
         ProjectsService,
         {
           provide: getRepositoryToken(Project),
+          useClass: MockRepository,
+        },
+        {
+          provide: getRepositoryToken(ProjectView),
           useClass: MockRepository,
         },
       ],
@@ -60,8 +68,18 @@ describe('ProjectsService', () => {
       tasks: [],
     };
 
+    projectView = {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      created: project.creationDate,
+      ownerName: user.name,
+      teamName: team.name,
+    };
+
     service = module.get<ProjectsService>(ProjectsService);
     repository = module.get(getRepositoryToken(Project));
+    viewRepository = module.get(getRepositoryToken(ProjectView));
   });
 
   it('should be defined', () => {
@@ -88,13 +106,42 @@ describe('ProjectsService', () => {
 
   it('should list all projects', async () => {
     const result = [
-      { ...project, id: 1, name: 'Team Awesome 1' },
-      { ...project, id: 2, name: 'Team Awesome 2' },
+      { ...project, id: 1, name: 'Project Awesome 1' },
+      { ...project, id: 2, name: 'Project Awesome 2' },
     ];
     repository.findAndCount.mockReturnValue([result, 2]);
     const args: Partial<ProjectsFindArgs> = { skip: 0, take: 25 };
     expect(await service.findAll(args as ProjectsFindArgs)).toEqual([
       result,
+      2,
+    ]);
+  });
+
+  it('should list all projects from the view', async () => {
+    const output = [projectView, { ...projectView, id: 2 }];
+    const query = {
+      select: () => query,
+      where: () => query,
+      orWhere: () => query,
+      andWhere: () => query,
+      skip: () => query,
+      take: () => query,
+      orderBy: () => query,
+      addOrderBy: () => query,
+      getCount: () => 2,
+      getMany: () => output,
+      getRawOne: () => {
+        return {
+          total: 2,
+        };
+      },
+    };
+    viewRepository.createQueryBuilder.mockReturnValue({
+      ...query,
+    });
+    const args: Partial<ProjectsViewArgs> = {};
+    expect(await service.findView(args as ProjectsViewArgs)).toEqual([
+      output,
       2,
     ]);
   });

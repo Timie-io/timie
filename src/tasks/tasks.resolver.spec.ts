@@ -6,7 +6,9 @@ import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewTaskInput } from './dto/new-task.input';
 import { TasksFindArgs } from './dto/tasks-find.args';
+import { TasksViewArgs } from './dto/tasks-view.args';
 import { UpdateTaskInput } from './dto/update-task.input';
+import { TaskView } from './task-view.entity';
 import { Task } from './task.entity';
 import { TasksResolver } from './tasks.resolver';
 import { TasksService } from './tasks.service';
@@ -16,6 +18,7 @@ describe('TasksResolver', () => {
   let user: Partial<User>;
   let currentUser: Partial<UserModel>;
   let task: Partial<Task>;
+  let taskView: Partial<TaskView>;
   let tasks: Task[];
   let project: Partial<Project>;
   let tasksService: Partial<TasksService>;
@@ -31,6 +34,7 @@ describe('TasksResolver', () => {
       isAdmin: false,
       password: 'somehashedpassword',
     };
+
     currentUser = {
       id: '1',
       name: 'Steven Taylor',
@@ -38,6 +42,7 @@ describe('TasksResolver', () => {
       creationDate: new Date(),
       isAdmin: false,
     };
+
     project = {
       id: 1,
       name: 'Awesome Project',
@@ -45,6 +50,7 @@ describe('TasksResolver', () => {
       creationDate: new Date(),
       owner: user as User,
     };
+
     task = {
       id: 1,
       title: 'Amazing Task',
@@ -57,6 +63,17 @@ describe('TasksResolver', () => {
       active: true,
     };
 
+    taskView = {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      projectName: project.name,
+      created: task.creationDate,
+      priority: task.priority,
+      creatorName: user.name,
+      active: task.active,
+    };
+
     tasks = [task as Task, { ...task, id: 2 } as Task];
 
     tasksService = {
@@ -65,6 +82,9 @@ describe('TasksResolver', () => {
       },
       async findAll(args, ...relations) {
         return [tasks, 2];
+      },
+      async findView(args) {
+        return [[taskView as TaskView], 1];
       },
       async create(data, project, user) {
         return task as Task;
@@ -137,6 +157,14 @@ describe('TasksResolver', () => {
     expect(await resolver.tasks(args as TasksFindArgs)).toEqual({
       result: tasks,
       total: 2,
+    });
+  });
+
+  it('should resolve a list of tasks from the view', async () => {
+    const result = [taskView as TaskView];
+    expect(await resolver.tasksView({} as TasksViewArgs)).toEqual({
+      result: result,
+      total: 1,
     });
   });
 

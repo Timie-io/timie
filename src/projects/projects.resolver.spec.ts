@@ -7,7 +7,9 @@ import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { NewProjectInput } from './dto/new-project-input';
 import { ProjectsFindArgs } from './dto/projects-find.args';
+import { ProjectsViewArgs } from './dto/projects-view.args';
 import { UpdateProjectInput } from './dto/update-project.input';
+import { ProjectView } from './project-view.entity';
 import { Project } from './project.entity';
 import { ProjectsResolver } from './projects.resolver';
 import { ProjectsService } from './projects.service';
@@ -18,6 +20,7 @@ describe('ProjectsResolver', () => {
   let userModel: UserModel;
   let team: Partial<Team>;
   let project: Partial<Project>;
+  let projectView: Partial<ProjectView>;
   let usersService: Partial<UsersService>;
   let teamsService: Partial<TeamsService>;
   let projectsService: Partial<ProjectsService>;
@@ -64,6 +67,15 @@ describe('ProjectsResolver', () => {
       team: team as Team,
     };
 
+    projectView = {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      created: project.creationDate,
+      ownerName: user.name,
+      teamName: team.name,
+    };
+
     usersService = {
       async findOneById(id: number, ...relations: string[]): Promise<User> {
         return user as User;
@@ -91,6 +103,9 @@ describe('ProjectsResolver', () => {
       },
       async findAll(args, ...relations) {
         return [[project as Project], 1];
+      },
+      async findView(args) {
+        return [[projectView as ProjectView], 1];
       },
     };
 
@@ -146,6 +161,14 @@ describe('ProjectsResolver', () => {
     expect(await resolver.projects(args as ProjectsFindArgs)).toEqual({
       result: projects,
       total: 2,
+    });
+  });
+
+  it('shoud resolve the view content', async () => {
+    const result = [projectView as ProjectView];
+    expect(await resolver.projectsView({} as ProjectsViewArgs)).toEqual({
+      result: result,
+      total: 1,
     });
   });
 
