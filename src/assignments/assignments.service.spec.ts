@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -6,17 +7,21 @@ import { MockRepository } from '../shared/mocks/repository.mock';
 import { Status } from '../status/status.entity';
 import { Task } from '../tasks/task.entity';
 import { User } from '../users/user.entity';
+import { AssignmentView } from './assignment-view.entity';
 import { Assignment } from './assignment.entity';
 import { AssignmentsService } from './assignments.service';
 import { AssignmentsFindArgs } from './dto/assignments-find.args';
+import { AssignmentsViewArgs } from './dto/assignments-view.args';
 
 describe('AssignmentsService', () => {
   let service: AssignmentsService;
   let repository: MockType<Repository<Assignment>>;
+  let viewRepository: MockType<Repository<AssignmentView>>;
   let user: Partial<User>;
   let task: Partial<Task>;
   let status: Partial<Status>;
   let assignment: Partial<Assignment>;
+  let assignmentView: Partial<AssignmentView>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +30,18 @@ describe('AssignmentsService', () => {
         {
           provide: getRepositoryToken(Assignment),
           useClass: MockRepository,
+        },
+        {
+          provide: getRepositoryToken(AssignmentView),
+          useClass: MockRepository,
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get(key: string) {
+              return null;
+            },
+          },
         },
       ],
     }).compile();
@@ -53,8 +70,17 @@ describe('AssignmentsService', () => {
       status: status as Status,
     };
 
+    assignmentView = {
+      id: 1,
+      note: assignment.note,
+      userName: user.name,
+      taskTitle: task.title,
+      statusCode: status.code,
+    };
+
     service = module.get<AssignmentsService>(AssignmentsService);
     repository = module.get(getRepositoryToken(Assignment));
+    viewRepository = module.get(getRepositoryToken(AssignmentView));
   });
 
   it('should be defined', () => {
@@ -86,6 +112,34 @@ describe('AssignmentsService', () => {
     const args: Partial<AssignmentsFindArgs> = { skip: 0, take: 25 };
     expect(await service.findAll(args as AssignmentsFindArgs)).toEqual([
       result,
+      2,
+    ]);
+  });
+
+  it('should find all assignments on the view', async () => {
+    const output = [assignmentView, { ...assignmentView, id: 2 }];
+    const query = {
+      select: () => query,
+      where: () => query,
+      orWhere: () => query,
+      andWhere: () => query,
+      skip: () => query,
+      take: () => query,
+      orderBy: () => query,
+      addOrderBy: () => query,
+      getCount: () => 2,
+      getMany: () => output,
+      getRawOne: () => {
+        return {
+          total: 2,
+        };
+      },
+    };
+    viewRepository.createQueryBuilder.mockReturnValue({
+      ...query,
+    });
+    expect(await service.findView({} as AssignmentsViewArgs)).toEqual([
+      output,
       2,
     ]);
   });

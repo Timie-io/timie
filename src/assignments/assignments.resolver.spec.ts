@@ -6,10 +6,12 @@ import { TasksService } from '../tasks/tasks.service';
 import { User as UserModel } from '../users/models/user.model';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
+import { AssignmentView } from './assignment-view.entity';
 import { Assignment } from './assignment.entity';
 import { AssignmentsResolver } from './assignments.resolver';
 import { AssignmentsService } from './assignments.service';
 import { AssignmentsFindArgs } from './dto/assignments-find.args';
+import { AssignmentsViewArgs } from './dto/assignments-view.args';
 import { NewAssignmentInput } from './dto/new-assignment.input';
 import { UpdateAssignmentInput } from './dto/update-assignment.input';
 
@@ -20,6 +22,7 @@ describe('AssignmentsResolver', () => {
   let tasksService: Partial<TasksService>;
   let usersService: Partial<UsersService>;
   let assignment: Partial<Assignment>;
+  let assignmentView: Partial<AssignmentView>;
   let status: Partial<Status>;
   let task: Partial<Task>;
   let user: Partial<User>;
@@ -58,12 +61,23 @@ describe('AssignmentsResolver', () => {
       creator: user as User,
     };
 
+    assignmentView = {
+      id: assignment.id,
+      note: assignment.note,
+      userName: user.name,
+      taskTitle: task.title,
+      statusCode: status.code,
+    };
+
     assignmentsService = {
       async findOneById(id, ...relations) {
         return assignment as Assignment;
       },
       async findAll(args, ...relations) {
         return [[assignment as Assignment], 1];
+      },
+      async findView(args) {
+        return [[assignmentView as AssignmentView], 1];
       },
       async create(data, task, user, creator, status) {
         return assignment as Assignment;
@@ -152,6 +166,14 @@ describe('AssignmentsResolver', () => {
   it('should resolve all', async () => {
     expect(await resolver.assignments({} as AssignmentsFindArgs)).toEqual({
       result: [assignment as Assignment],
+      total: 1,
+    });
+  });
+
+  it('should resolve the view', async () => {
+    const result = [assignmentView as AssignmentView];
+    expect(await resolver.assignmentsView({} as AssignmentsViewArgs)).toEqual({
+      result: result,
       total: 1,
     });
   });
